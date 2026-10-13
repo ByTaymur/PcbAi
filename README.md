@@ -164,11 +164,6 @@ projede ilgili başka dosya/kural/kütüphane değişince eski revizyonla uygula
   çapraz seçim, üretici DFM, BOM/CPL, katalog/stok, IR ve otorota henüz yoktur.
 - ERC/DRC temizliği gerçek devrenin elektriksel/fiziksel çalıştığının kanıtı değildir.
 
-[Araç sözleşmeleri](docs/tools.md) · [Güvenlik](SECURITY.md) · [Karar kayıtları](docs/decisions/0001-core.md).
-Ana proje LGPL-2.1-or-later lisanslıdır ([K1 kararı](docs/decisions/0002-license.md)).
-CadAI uygulama kodu kopyalanmadı; görünümün three.js/three-mesh-bvh
-MIT paketi kardeş depodan yalnız okunarak alındı ve lisansları VSIX’e dahil edildi.
-
 Uzun denetim/çıktı için `start_job` çağrısına `session`, `document`, `revision` ve `tool` gönderin;
 `job_status(job_id)` ile asıl araç sonucunu izleyin. Servis yeniden başladığında iş kimlikleri geçersiz olur.
 İzole canlı bağlantı deneyini yeniden çalıştırma: `python scripts/spike_ipc.py --run --output .pcbai-state/S1-result.json`.
