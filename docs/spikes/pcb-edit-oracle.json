@@ -1,0 +1,50 @@
+[
+ {
+  "ops": 15,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 115656,
+  "demo": "ecc83",
+  "board": "ecc83-pp.kicad_pcb"
+ },
+ {
+  "ops": 15,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 165801,
+  "demo": "ecc83",
+  "board": "ecc83-pp_v2.kicad_pcb"
+ },
+ {
+  "ops": 25,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 597429,
+  "demo": "interf_u",
+  "board": "interf_u.kicad_pcb"
+ },
+ {
+  "ops": 63,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 623067,
+  "demo": "pic_programmer",
+  "board": "pic_programmer.kicad_pcb"
+ },
+ {
+  "ops": 189,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 5584615,
+  "demo": "video",
+  "board": "video.kicad_pcb"
+ },
+ {
+  "ops": 94,
+  "refused": [],
+  "problems": [],
+  "changed_bytes": 1056671,
+  "demo": "stickhub",
+  "board": "StickHub.kicad_pcb"
+ }
+]

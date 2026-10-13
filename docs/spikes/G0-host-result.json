@@ -1,0 +1,11 @@
+{
+  "vscode_version": "1.141.0",
+  "extension_version": "0.1.4",
+  "real_extension_host": true,
+  "webview_ready": true,
+  "three_revision": "186",
+  "real_service_board_loaded": true,
+  "board_document": "ecc83-pp.kicad_pcb",
+  "layer_count": 7,
+  "user_profile_isolated": true
+}

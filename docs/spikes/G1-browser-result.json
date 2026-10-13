@@ -1,0 +1,32 @@
+{
+  "browser": "156.0.8078.4",
+  "boards": [
+    {
+      "demo": "ecc83",
+      "footprints_clicked": 15,
+      "drc_positions_checked": 4,
+      "marker_persisted": true,
+      "marker_edit_delete_all_kinds_checked": true,
+      "source_bytes_unchanged_by_marker": true,
+      "refresh_ms": 7528
+    },
+    {
+      "demo": "interf_u",
+      "footprints_clicked": 25,
+      "drc_positions_checked": 6,
+      "marker_persisted": true,
+      "marker_edit_delete_all_kinds_checked": false,
+      "source_bytes_unchanged_by_marker": true,
+      "refresh_ms": 9903
+    },
+    {
+      "demo": "pic_programmer",
+      "footprints_clicked": 63,
+      "drc_positions_checked": 0,
+      "marker_persisted": true,
+      "marker_edit_delete_all_kinds_checked": false,
+      "source_bytes_unchanged_by_marker": true,
+      "refresh_ms": 9686
+    }
+  ]
+}

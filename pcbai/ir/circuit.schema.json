@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pcbai:circuit:1",
+  "title": "PcbAi circuit intent v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["ir_version", "requirements", "rails", "blocks", "parts", "connections"],
+  "properties": {
+    "ir_version": {"const": 1, "type": "integer"},
+    "requirements": {"type": "object", "additionalProperties": false, "properties": {
+      "vin": {"oneOf": [{"$ref": "#/$defs/quantity"}, {"type": "object", "required": ["min", "max"], "additionalProperties": false, "properties": {"min": {"$ref": "#/$defs/quantity"}, "max": {"$ref": "#/$defs/quantity"}}}]},
+      "board_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000}},
+      "layers": {"type": "integer", "enum": [2, 4]},
+      "fab": {"enum": ["jlcpcb", "pcbway", "unspecified"]},
+      "assembly": {"enum": ["smt", "tht", "mixed", "unspecified"]},
+      "budget_usd": {"type": "number", "minimum": 0, "maximum": 1000000}
+    }},
+    "rails": {"type": "object", "maxProperties": 64, "propertyNames": {"pattern": "^[A-Za-z0-9_+/-]{1,64}$"}, "additionalProperties": {"type": "object", "additionalProperties": false, "oneOf": [{"required": ["ground"]}, {"required": ["from"]}], "properties": {
+      "ground": {"const": true}, "from": {"$ref": "#/$defs/endpoint"},
+      "voltage": {"$ref": "#/$defs/quantity"}, "current_limit": {"$ref": "#/$defs/quantity"}
+    }}},
+    "blocks": {"type": "array", "maxItems": 64, "items": {"type": "object", "additionalProperties": false, "required": ["id", "block", "params"], "properties": {
+      "id": {"$ref": "#/$defs/id"}, "block": {"$ref": "#/$defs/id"},
+      "params": {"type": "object", "maxProperties": 32}
+    }}},
+    "parts": {"type": "array", "maxItems": 150, "items": {"type": "object", "additionalProperties": false, "required": ["id", "symbol"], "properties": {
+      "id": {"$ref": "#/$defs/id"}, "symbol": {"type": "string", "minLength": 3, "maxLength": 256},
+      "footprint": {"type": "string", "maxLength": 256}, "value": {"type": "string", "maxLength": 256},
+      "role": {"type": "string", "maxLength": 256}, "verified": {"const": false},
+      "unit": {"type": "integer", "minimum": 1, "maximum": 100}
+    }}},
+    "connections": {"type": "array", "maxItems": 1000, "items": {"type": "array", "minItems": 2, "maxItems": 64, "items": {"$ref": "#/$defs/endpoint"}}},
+    "constraints": {"type": "array", "maxItems": 128, "items": {"oneOf": [
+      {"type": "object", "additionalProperties": false, "required": ["edge", "side"], "properties": {"edge": {"type": "string", "maxLength": 128}, "side": {"enum": ["left", "right", "top", "bottom"]}}},
+      {"type": "object", "additionalProperties": false, "required": ["keepout_mm", "around"], "properties": {"keepout_mm": {"type": "number", "minimum": 0, "maximum": 1000}, "around": {"$ref": "#/$defs/id"}}}
+    ]}},
+    "assumptions": {"type": "array", "maxItems": 100, "items": {"type": "string", "maxLength": 512}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]{0,63}$"},
+    "quantity": {"oneOf": [{"type": "number"}, {"type": "string", "minLength": 1, "maxLength": 100}]},
+    "endpoint": {"type": "string", "minLength": 2, "maxLength": 256, "pattern": "^(?:@[A-Za-z0-9_+/-]+|[A-Za-z_][A-Za-z0-9_-]*\\..+)$"}
+  }
+}

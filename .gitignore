@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.ikiz/
+.pcbai-state/
+benchmark/results/
+.tools/
+node_modules/
+.vscode-test/

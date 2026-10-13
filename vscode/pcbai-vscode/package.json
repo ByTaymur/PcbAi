@@ -1,0 +1,137 @@
+{
+  "name": "pcbai-vscode",
+  "displayName": "PcbAi · KiCad",
+  "description": "KiCad projeleri için PcbAi: kart ve şematik görünümü, işaretler, kart önizlemesi, ölçümler, ERC/DRC, şematik PDF, MCP kaydı.",
+  "version": "0.1.16",
+  "license": "LGPL-2.1-or-later",
+  "publisher": "taymur",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pcbai.start",
+        "title": "Servisi başlat",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.stop",
+        "title": "Servisi durdur",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.status",
+        "title": "Durum",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.check",
+        "title": "ERC ve DRC çalıştır",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.pdf",
+        "title": "Şematik PDF",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.render",
+        "title": "Kart önizlemesini aç (3B PNG)",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.viewEmpty",
+        "title": "Görünüm panelini aç (G0)",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.view",
+        "title": "Kart 2B görünümünü aç",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.schematic",
+        "title": "Şematik görünümünü aç",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.view3d",
+        "title": "Kartın 3B görünümünü aç",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.stats",
+        "title": "Kart ölçülerini göster",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.addMcp",
+        "title": "MCP'yi bu çalışma alanına ekle (.mcp.json)",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.autoroute",
+        "title": "Otomatik rota (önizle)",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.autoplace",
+        "title": "Otomatik yerleşim (önizle)",
+        "category": "PcbAi"
+      }
+    ],
+    "configuration": {
+      "title": "PcbAi",
+      "properties": {
+        "pcbai.root": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "PcbAi deposunun klasörü (içinde .venv bulunan). Boşsa paketlenirken yazılan yol kullanılır."
+        },
+        "pcbai.python": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Servis Python'u. Boşsa <pcbai.root>/.venv/Scripts/python.exe."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "pcbai",
+          "title": "PcbAi",
+          "icon": "media/pcbai-activity.svg"
+        }
+      ]
+    },
+    "views": {
+      "pcbai": [
+        {
+          "id": "pcbai.actions",
+          "name": "PcbAi",
+          "type": "webview"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node test_extension.js && node test/sidebar.test.js",
+    "test:viewer": "node test/viewer.e2e.js",
+    "test:sch": "node test/sch.e2e.js",
+    "test:3d": "node test/view3d.e2e.js",
+    "test:engines": "node test/engine.e2e.js"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}

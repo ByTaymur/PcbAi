@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 6px 10px 12px; color: var(--vscode-foreground); font: 12px var(--vscode-font-family, sans-serif); }
+button { color: var(--vscode-button-secondaryForeground, #e4e7eb); background: var(--vscode-button-secondaryBackground, #2b3440);
+  border: 1px solid transparent; border-radius: 3px; padding: 3px 8px; font: inherit; cursor: pointer; }
+button:hover { background: var(--vscode-button-secondaryHoverBackground, #37424f); }
+button.primary { color: var(--vscode-button-foreground, white); background: var(--vscode-button-background, #285e81); }
+button.primary:hover { background: var(--vscode-button-hoverBackground, #3a779b); }
+button.link { background: none; color: var(--vscode-textLink-foreground, #4daafc); padding: 0 2px; }
+.project, .row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 4px 0 8px; }
+#project { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actions { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+label[for="request"] { display: block; font-weight: 600; margin-bottom: 4px; }
+textarea { width: 100%; resize: vertical; padding: 6px; font: inherit; color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background); border: 1px solid var(--vscode-input-border, #4b5664); border-radius: 2px; }
+textarea:focus { outline: 1px solid var(--vscode-focusBorder, #4daafc); }
+.row { margin-top: 12px; }
+#markers { max-height: 40vh; overflow-y: auto; }
+.marker { display: flex; gap: 6px; align-items: flex-start; padding: 4px 0; border-bottom: 1px solid var(--vscode-widget-border, #2c333c);
+  overflow-wrap: anywhere; cursor: pointer; }
+.marker.closed { opacity: .6; }
+.send { display: flex; gap: 6px; margin: 10px 0 6px; }
+.send .primary { flex: 1; }
+details { margin-top: 6px; } summary { cursor: pointer; color: var(--vscode-descriptionForeground); }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 11px var(--vscode-editor-font-family, monospace); max-height: 30vh; overflow-y: auto; }
+.muted { color: var(--vscode-descriptionForeground, #8f9cab); }
+.error { color: var(--vscode-errorForeground, #f48771); }

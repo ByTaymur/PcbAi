@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pcbai"
+version = "0.1.11"
+description = "Local, evidence-backed KiCad tools for AI assistants"
+license = {text = "LGPL-2.1-or-later"}
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.26,<5"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.11,<1"]
+ipc = ["kicad-python==0.8.0"]
+
+[project.scripts]
+pcbai = "pcbai.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["pcbai*", "mcp_server*"]
+
+[tool.setuptools.package-data]
+"pcbai.ir" = ["*.json"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]

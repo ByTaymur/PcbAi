@@ -1,0 +1,1050 @@
+{
+  "kicad_version": "10.0.4",
+  "tolerance_mm": 0.05,
+  "demos": [
+    {
+      "demo": "ecc83",
+      "pages": 1,
+      "render_seconds": 1.68,
+      "scene_seconds": 0.09,
+      "drawn_pins": 33,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 25,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 13,
+      "nets": 13,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "ecc83-pp.kicad_sch",
+          "symbols": 26,
+          "pins": 42,
+          "drawn_pins": 33,
+          "max_pin_error_mm": 0.0,
+          "wires": 37,
+          "wires_with_net": 37,
+          "warnings": []
+        }
+      ],
+      "samples": [
+        {
+          "reference": "P7",
+          "pin": "1",
+          "net": "unconnected-(P7-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "R4",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "7",
+          "net": "Net-(U1A-G)",
+          "equal": true
+        },
+        {
+          "reference": "P5",
+          "pin": "1",
+          "net": "unconnected-(P5-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "P1",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "P2",
+          "pin": "1",
+          "net": "Net-(P2-P1)",
+          "equal": true
+        },
+        {
+          "reference": "R4",
+          "pin": "1",
+          "net": "Net-(P1-PM)",
+          "equal": true
+        },
+        {
+          "reference": "C1",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "C2",
+          "pin": "1",
+          "net": "Net-(P2-P1)",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "5",
+          "net": "Net-(P4-PM)",
+          "equal": true
+        },
+        {
+          "reference": "P2",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R1",
+          "pin": "1",
+          "net": "Net-(U1A-G)",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "4",
+          "net": "Net-(P4-PM)",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "6",
+          "net": "Net-(P3-P1)",
+          "equal": true
+        },
+        {
+          "reference": "C1",
+          "pin": "1",
+          "net": "Net-(P3-P1)",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "9",
+          "net": "Net-(P4-P1)",
+          "equal": true
+        },
+        {
+          "reference": "P8",
+          "pin": "1",
+          "net": "unconnected-(P8-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "R1",
+          "pin": "2",
+          "net": "Net-(U1A-K)",
+          "equal": true
+        },
+        {
+          "reference": "R3",
+          "pin": "1",
+          "net": "Net-(P2-P1)",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "3",
+          "net": "Net-(U1B-K)",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    },
+    {
+      "demo": "complex_hierarchy",
+      "pages": 3,
+      "render_seconds": 2.92,
+      "scene_seconds": 0.91,
+      "drawn_pins": 168,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 156,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 52,
+      "nets": 52,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "complex_hierarchy.kicad_sch",
+          "symbols": 27,
+          "pins": 43,
+          "drawn_pins": 26,
+          "max_pin_error_mm": 0.0,
+          "wires": 44,
+          "wires_with_net": 44,
+          "warnings": []
+        },
+        {
+          "page": "/ampli_ht_vertical/",
+          "document": "ampli_ht.kicad_sch",
+          "symbols": 46,
+          "pins": 87,
+          "drawn_pins": 71,
+          "max_pin_error_mm": 0.0,
+          "wires": 81,
+          "wires_with_net": 81,
+          "warnings": []
+        },
+        {
+          "page": "/ampli_ht_horizontal/",
+          "document": "ampli_ht.kicad_sch",
+          "symbols": 46,
+          "pins": 87,
+          "drawn_pins": 71,
+          "max_pin_error_mm": 0.0,
+          "wires": 81,
+          "wires_with_net": 81,
+          "warnings": []
+        }
+      ],
+      "samples": [
+        {
+          "reference": "U102",
+          "pin": "7",
+          "net": "unconnected-(U102-OSC-Pad7)",
+          "equal": true
+        },
+        {
+          "reference": "P201",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R212",
+          "pin": "2",
+          "net": "Net-(R212-Pad2)",
+          "equal": true
+        },
+        {
+          "reference": "C303",
+          "pin": "1",
+          "net": "Net-(U301B-+)",
+          "equal": true
+        },
+        {
+          "reference": "R310",
+          "pin": "1",
+          "net": "/ampli_ht_horizontal/S_OUT+",
+          "equal": true
+        },
+        {
+          "reference": "Q202",
+          "pin": "1",
+          "net": "Net-(Q202-E)",
+          "equal": true
+        },
+        {
+          "reference": "C103",
+          "pin": "2",
+          "net": "-VAA",
+          "equal": true
+        },
+        {
+          "reference": "Q301",
+          "pin": "1",
+          "net": "Net-(Q301-E)",
+          "equal": true
+        },
+        {
+          "reference": "RV201",
+          "pin": "2",
+          "net": "Net-(U201A--)",
+          "equal": true
+        },
+        {
+          "reference": "R213",
+          "pin": "1",
+          "net": "Net-(R213-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "R308",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R209",
+          "pin": "2",
+          "net": "Net-(Q203-E)",
+          "equal": true
+        },
+        {
+          "reference": "D201",
+          "pin": "2",
+          "net": "HT",
+          "equal": true
+        },
+        {
+          "reference": "Q204",
+          "pin": "2",
+          "net": "Net-(Q204-B)",
+          "equal": true
+        },
+        {
+          "reference": "C304",
+          "pin": "1",
+          "net": "Net-(C304-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "C204",
+          "pin": "1",
+          "net": "Net-(C204-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "R210",
+          "pin": "1",
+          "net": "/ampli_ht_vertical/S_OUT+",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "3",
+          "net": "/ampli_ht_horizontal/Vpil_0_3,3V",
+          "equal": true
+        },
+        {
+          "reference": "R209",
+          "pin": "1",
+          "net": "/ampli_ht_vertical/S_OUT+",
+          "equal": true
+        },
+        {
+          "reference": "D101",
+          "pin": "2",
+          "net": "/12Vext",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    },
+    {
+      "demo": "pic_programmer",
+      "pages": 2,
+      "render_seconds": 3.49,
+      "scene_seconds": 0.91,
+      "drawn_pins": 242,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 236,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 111,
+      "nets": 111,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "pic_programmer.kicad_sch",
+          "symbols": 105,
+          "pins": 182,
+          "drawn_pins": 136,
+          "max_pin_error_mm": 0.0,
+          "wires": 131,
+          "wires_with_net": 131,
+          "warnings": []
+        },
+        {
+          "page": "/pic_sockets/",
+          "document": "pic_sockets.kicad_sch",
+          "symbols": 19,
+          "pins": 118,
+          "drawn_pins": 106,
+          "max_pin_error_mm": 0.0,
+          "wires": 66,
+          "wires_with_net": 66,
+          "warnings": []
+        }
+      ],
+      "samples": [
+        {
+          "reference": "R7",
+          "pin": "2",
+          "net": "Net-(Q2-B)",
+          "equal": true
+        },
+        {
+          "reference": "C9",
+          "pin": "1",
+          "net": "VPP",
+          "equal": true
+        },
+        {
+          "reference": "P3",
+          "pin": "12",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "P2",
+          "pin": "14",
+          "net": "unconnected-(P2-Pad14)",
+          "equal": true
+        },
+        {
+          "reference": "RV1",
+          "pin": "3",
+          "net": "Net-(R16-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "D12",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "Q2",
+          "pin": "2",
+          "net": "Net-(Q2-B)",
+          "equal": true
+        },
+        {
+          "reference": "U6",
+          "pin": "4",
+          "net": "/VPP/MCLR",
+          "equal": true
+        },
+        {
+          "reference": "R6",
+          "pin": "1",
+          "net": "/PC-CLOCK-OUT",
+          "equal": true
+        },
+        {
+          "reference": "R1",
+          "pin": "1",
+          "net": "/VPP_ON",
+          "equal": true
+        },
+        {
+          "reference": "U6",
+          "pin": "3",
+          "net": "unconnected-(U6-GP4/OSC2-Pad3)",
+          "equal": true
+        },
+        {
+          "reference": "P1",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R17",
+          "pin": "1",
+          "net": "Net-(Q2-C)",
+          "equal": true
+        },
+        {
+          "reference": "U4",
+          "pin": "5",
+          "net": "VCC",
+          "equal": true
+        },
+        {
+          "reference": "D8",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R2",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "D1",
+          "pin": "1",
+          "net": "Net-(D1-K)",
+          "equal": true
+        },
+        {
+          "reference": "R12",
+          "pin": "1",
+          "net": "Net-(R12-Pad1)",
+          "equal": true
+        },
+        {
+          "reference": "C5",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "Q1",
+          "pin": "3",
+          "net": "GND",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    },
+    {
+      "demo": "video",
+      "pages": 8,
+      "render_seconds": 9.29,
+      "scene_seconds": 3.13,
+      "drawn_pins": 2023,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 1840,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 588,
+      "nets": 588,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "video.kicad_sch",
+          "symbols": 10,
+          "pins": 22,
+          "drawn_pins": 17,
+          "max_pin_error_mm": 0.0,
+          "wires": 147,
+          "wires_with_net": 147,
+          "warnings": []
+        },
+        {
+          "page": "/buspci.sch/",
+          "document": "bus_pci.kicad_sch",
+          "symbols": 119,
+          "pins": 490,
+          "drawn_pins": 404,
+          "max_pin_error_mm": 0.0,
+          "wires": 424,
+          "wires_with_net": 424,
+          "warnings": []
+        },
+        {
+          "page": "/graphic/",
+          "document": "graphic.kicad_sch",
+          "symbols": 59,
+          "pins": 360,
+          "drawn_pins": 333,
+          "max_pin_error_mm": 0.0,
+          "wires": 391,
+          "wires_with_net": 391,
+          "warnings": []
+        },
+        {
+          "page": "/ESVIDEO-RVB/",
+          "document": "esvideo.kicad_sch",
+          "symbols": 50,
+          "pins": 227,
+          "drawn_pins": 206,
+          "max_pin_error_mm": 0.0,
+          "wires": 225,
+          "wires_with_net": 225,
+          "warnings": []
+        },
+        {
+          "page": "/pal-ntsc.sch/",
+          "document": "pal-ntsc.kicad_sch",
+          "symbols": 59,
+          "pins": 233,
+          "drawn_pins": 210,
+          "max_pin_error_mm": 0.0,
+          "wires": 274,
+          "wires_with_net": 274,
+          "warnings": []
+        },
+        {
+          "page": "/RAMS/",
+          "document": "rams.kicad_sch",
+          "symbols": 24,
+          "pins": 592,
+          "drawn_pins": 576,
+          "max_pin_error_mm": 0.0,
+          "wires": 496,
+          "wires_with_net": 496,
+          "warnings": []
+        },
+        {
+          "page": "/muxdata/",
+          "document": "muxdata.kicad_sch",
+          "symbols": 8,
+          "pins": 183,
+          "drawn_pins": 172,
+          "max_pin_error_mm": 0.0,
+          "wires": 174,
+          "wires_with_net": 174,
+          "warnings": []
+        },
+        {
+          "page": "/modul/",
+          "document": "modul.kicad_sch",
+          "symbols": 66,
+          "pins": 132,
+          "drawn_pins": 105,
+          "max_pin_error_mm": 0.0,
+          "wires": 101,
+          "wires_with_net": 101,
+          "warnings": []
+        }
+      ],
+      "samples": [
+        {
+          "reference": "U22",
+          "pin": "100",
+          "net": "+5V",
+          "equal": true
+        },
+        {
+          "reference": "R4",
+          "pin": "1",
+          "net": "Net-(U20-MCTR)",
+          "equal": true
+        },
+        {
+          "reference": "P11",
+          "pin": "1",
+          "net": "Net-(U23-PGCK4)",
+          "equal": true
+        },
+        {
+          "reference": "U8",
+          "pin": "75",
+          "net": "Net-(U8-BVID0)",
+          "equal": true
+        },
+        {
+          "reference": "U24",
+          "pin": "82",
+          "net": "/X_PROG-",
+          "equal": true
+        },
+        {
+          "reference": "U17",
+          "pin": "26",
+          "net": "/TVRAM7",
+          "equal": true
+        },
+        {
+          "reference": "U13",
+          "pin": "6",
+          "net": "/TVRAM2",
+          "equal": true
+        },
+        {
+          "reference": "U22",
+          "pin": "60",
+          "net": "/TVRAM29",
+          "equal": true
+        },
+        {
+          "reference": "U17",
+          "pin": "36",
+          "net": "unconnected-(U17-NC-Pad36)",
+          "equal": true
+        },
+        {
+          "reference": "U4",
+          "pin": "16",
+          "net": "/TVRAM10",
+          "equal": true
+        },
+        {
+          "reference": "U13",
+          "pin": "39",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U10",
+          "pin": "40",
+          "net": "/pal-ntsc.sch/VAF",
+          "equal": true
+        },
+        {
+          "reference": "U16",
+          "pin": "51",
+          "net": "/TVRAM9",
+          "equal": true
+        },
+        {
+          "reference": "U11",
+          "pin": "3",
+          "net": "/buspci.sch/P_AD22",
+          "equal": true
+        },
+        {
+          "reference": "U24",
+          "pin": "70",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U4",
+          "pin": "10",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U12",
+          "pin": "69",
+          "net": "unconnected-(U12-PRD2-Pad69)",
+          "equal": true
+        },
+        {
+          "reference": "D6",
+          "pin": "1",
+          "net": "Net-(D6-A)",
+          "equal": true
+        },
+        {
+          "reference": "Q1",
+          "pin": "3",
+          "net": "+5F",
+          "equal": true
+        },
+        {
+          "reference": "U23",
+          "pin": "37",
+          "net": "/BE-1",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    },
+    {
+      "demo": "kit-dev-coldfire-xilinx_5213",
+      "pages": 3,
+      "render_seconds": 4.6,
+      "scene_seconds": 1.35,
+      "drawn_pins": 778,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 582,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 278,
+      "nets": 278,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "kit-dev-coldfire-xilinx_5213.kicad_sch",
+          "symbols": 118,
+          "pins": 308,
+          "drawn_pins": 258,
+          "max_pin_error_mm": 0.0,
+          "wires": 367,
+          "wires_with_net": 365,
+          "warnings": [
+            "Wires without a netlisted pin on this page have no net name"
+          ]
+        },
+        {
+          "page": "/xilinx/",
+          "document": "xilinx.kicad_sch",
+          "symbols": 33,
+          "pins": 240,
+          "drawn_pins": 205,
+          "max_pin_error_mm": 0.0,
+          "wires": 172,
+          "wires_with_net": 162,
+          "warnings": [
+            "Wires without a netlisted pin on this page have no net name"
+          ]
+        },
+        {
+          "page": "/inout_user/",
+          "document": "in_out_conn.kicad_sch",
+          "symbols": 130,
+          "pins": 377,
+          "drawn_pins": 315,
+          "max_pin_error_mm": 0.0,
+          "wires": 323,
+          "wires_with_net": 319,
+          "warnings": [
+            "Wires without a netlisted pin on this page have no net name"
+          ]
+        }
+      ],
+      "samples": [
+        {
+          "reference": "U301",
+          "pin": "116",
+          "net": "/xilinx/XIL_D31",
+          "equal": true
+        },
+        {
+          "reference": "C217",
+          "pin": "1",
+          "net": "+3.3V",
+          "equal": true
+        },
+        {
+          "reference": "U202",
+          "pin": "13",
+          "net": "/inout_user/RXD0",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "69",
+          "net": "unconnected-(U301-H3-Pad69)",
+          "equal": true
+        },
+        {
+          "reference": "R103",
+          "pin": "1",
+          "net": "Net-(LEDABRT101-K)",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "8",
+          "net": "/xilinx/XIL_D3",
+          "equal": true
+        },
+        {
+          "reference": "R125",
+          "pin": "1",
+          "net": "/XTAL",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "26",
+          "net": "unconnected-(U301-N13-Pad26)",
+          "equal": true
+        },
+        {
+          "reference": "U102",
+          "pin": "81",
+          "net": "+3.3V",
+          "equal": true
+        },
+        {
+          "reference": "U102",
+          "pin": "9",
+          "net": "/URTS0",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "137",
+          "net": "/xilinx/XIL_D26",
+          "equal": true
+        },
+        {
+          "reference": "MCU_PORT201",
+          "pin": "15",
+          "net": "/PWM3",
+          "equal": true
+        },
+        {
+          "reference": "Q101",
+          "pin": "3",
+          "net": "Net-(Q101-C)",
+          "equal": true
+        },
+        {
+          "reference": "D201",
+          "pin": "1",
+          "net": "Net-(D201-K)",
+          "equal": true
+        },
+        {
+          "reference": "R124",
+          "pin": "2",
+          "net": "+3.3V",
+          "equal": true
+        },
+        {
+          "reference": "U202",
+          "pin": "10",
+          "net": "Net-(U202-T2IN)",
+          "equal": true
+        },
+        {
+          "reference": "P303",
+          "pin": "32",
+          "net": "/xilinx/XIL_D34",
+          "equal": true
+        },
+        {
+          "reference": "U102",
+          "pin": "96",
+          "net": "/RSTI-",
+          "equal": true
+        },
+        {
+          "reference": "U301",
+          "pin": "38",
+          "net": "unconnected-(U301-O13-Pad38)",
+          "equal": true
+        },
+        {
+          "reference": "C204",
+          "pin": "1",
+          "net": "+3.3V",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    },
+    {
+      "demo": "stickhub",
+      "pages": 1,
+      "render_seconds": 2.99,
+      "scene_seconds": 0.68,
+      "drawn_pins": 266,
+      "max_pin_error_mm": 0.0,
+      "pins_over_0_05_mm": 0,
+      "body_ends_matching": 266,
+      "max_identity_deviation_mm": 0.0,
+      "sampled_pins_net_equal": 20,
+      "sampled_pins": 20,
+      "nets_equal": 47,
+      "nets": 47,
+      "page_details": [
+        {
+          "page": "/",
+          "document": "StickHub.kicad_sch",
+          "symbols": 140,
+          "pins": 312,
+          "drawn_pins": 266,
+          "max_pin_error_mm": 0.0,
+          "wires": 470,
+          "wires_with_net": 470,
+          "warnings": []
+        }
+      ],
+      "samples": [
+        {
+          "reference": "U2",
+          "pin": "5",
+          "net": "+5V",
+          "equal": true
+        },
+        {
+          "reference": "D20",
+          "pin": "RA",
+          "net": "/LC",
+          "equal": true
+        },
+        {
+          "reference": "J8",
+          "pin": "3",
+          "net": "/U7D+",
+          "equal": true
+        },
+        {
+          "reference": "D25",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "C12",
+          "pin": "1",
+          "net": "+1V8",
+          "equal": true
+        },
+        {
+          "reference": "J3",
+          "pin": "3",
+          "net": "/U2D+",
+          "equal": true
+        },
+        {
+          "reference": "J8",
+          "pin": "2",
+          "net": "/U7D-",
+          "equal": true
+        },
+        {
+          "reference": "D8",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "C17",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "17",
+          "net": "/U2D+",
+          "equal": true
+        },
+        {
+          "reference": "D5",
+          "pin": "1",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "R2",
+          "pin": "1",
+          "net": "Net-(U1-VBUS_SENSE)",
+          "equal": true
+        },
+        {
+          "reference": "J3",
+          "pin": "4",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "U1",
+          "pin": "14",
+          "net": "/U3D+",
+          "equal": true
+        },
+        {
+          "reference": "D15",
+          "pin": "GK",
+          "net": "/LC",
+          "equal": true
+        },
+        {
+          "reference": "R7",
+          "pin": "1",
+          "net": "Net-(D15-1)",
+          "equal": true
+        },
+        {
+          "reference": "C36",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "D13",
+          "pin": "2",
+          "net": "/U7D-",
+          "equal": true
+        },
+        {
+          "reference": "C15",
+          "pin": "2",
+          "net": "GND",
+          "equal": true
+        },
+        {
+          "reference": "D18",
+          "pin": "RK",
+          "net": "Net-(D18-1)",
+          "equal": true
+        }
+      ],
+      "source_revision_unchanged": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "core_version": "0.1.3",
+  "extension_version": "0.1.4",
+  "vsix_sha256": "e78e46036144c3ed582defff990dcdb9e3b8ef7fd4c59a565a2ccbb05296d695",
+  "package_matches_source": true,
+  "installed_cli_verified": "taymur.pcbai-vscode@0.1.4",
+  "full_tests": {
+    "total": 118,
+    "passed": 114,
+    "skipped": 4
+  },
+  "real_cli_tests": {
+    "total": 11,
+    "passed": 8,
+    "skipped": 3
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://go.kicad.org/api/schemas/v1",
+  "identifier": "org.pcbai.kicad",
+  "name": "PcbAi",
+  "license": "LGPL-2.1-or-later",
+  "description": "Açık kartın projesini PcbAi servisine kaydeder ve kaydedilmiş dosyalarda ERC/DRC çalıştırır.",
+  "runtime": {
+    "type": "python",
+    "min_version": "3.9"
+  },
+  "actions": [
+    {
+      "identifier": "pcbai.register",
+      "name": "PcbAi'ye kaydet",
+      "description": "Bu projeyi PcbAi servisine kaydet; yapay zekâ ajanları projeyi MCP üzerinden görür.",
+      "show-button": true,
+      "scopes": ["pcb"],
+      "entrypoint": "register.py",
+      "icons-light": ["icons/register-24.png", "icons/register-48.png"],
+      "icons-dark": ["icons/register-24.png", "icons/register-48.png"]
+    },
+    {
+      "identifier": "pcbai.check",
+      "name": "PcbAi ERC/DRC",
+      "description": "Kaydedilmiş şematikte ERC, kartta DRC (parite dahil) çalıştırır ve sonucu gösterir.",
+      "show-button": true,
+      "scopes": ["pcb"],
+      "entrypoint": "check.py",
+      "icons-light": ["icons/check-24.png", "icons/check-48.png"],
+      "icons-dark": ["icons/check-24.png", "icons/check-48.png"]
+    }
+  ]
+}

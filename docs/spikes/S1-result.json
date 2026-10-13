@@ -1,0 +1,39 @@
+{
+  "kicad": "10.0.4",
+  "s1_complete": false,
+  "s3_complete": false,
+  "instances": [
+    {
+      "socket": "api.sock",
+      "project": "project-1",
+      "open_pcb_count": 1,
+      "token_required": false,
+      "live_sha256": "d18a9c91c76f00ef2b09a0ec01fd751d1a9a820ae9d9292ac8f44d8f4398d829",
+      "saved_sha256": "dec4d97c6c0e4551e0d42dfa99e27d3cb64979f9d70a3ee0d44c2101881dfceb",
+      "buffer_matches_saved_bytes": false,
+      "selection_count": 0,
+      "lock_files": [
+        "~ecc83-pp.kicad_pcb.lck",
+        "~ecc83-pp.kicad_pro.lck"
+      ]
+    }
+  ],
+  "failed_probes": [
+    {
+      "socket": "api.sock",
+      "error": "KiCad returned error: KiCad is not ready to reply",
+      "attempts": 26
+    },
+    {
+      "socket": "api-13236.sock",
+      "error": "Failed to connect to KiCad: Connection refused",
+      "attempts": 27
+    },
+    {
+      "socket": "api-11908.sock",
+      "error": "Failed to connect to KiCad: Connection refused",
+      "attempts": 27
+    }
+  ],
+  "user_config_unchanged": true
+}
