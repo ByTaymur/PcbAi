@@ -32,7 +32,8 @@ class PrivateConfigTests(unittest.TestCase):
             (user / "fp-lib-table").write_text("(fp_lib_table)")
             (user / "colors/mine.json").write_text("{}")
             (user / "3rdparty").mkdir()
-            with patch.dict(os.environ, {"APPDATA": str(Path(tmp) / "appdata")}, clear=False):
+            appdata = str(Path(tmp) / "appdata")
+            with patch.dict(os.environ, {"APPDATA": appdata, "XDG_CONFIG_HOME": appdata}, clear=False):
                 os.environ.pop("KICAD_CONFIG_HOME", None)
                 home = private_kicad_config(fake_cli, Path(tmp) / "private")
             self.assertEqual(sorted(p.relative_to(home).as_posix() for p in home.rglob("*") if p.is_file()),
@@ -52,7 +53,7 @@ class UserSettingsUntouchedTests(unittest.TestCase):
             project = Path(tmp) / "p"
             shutil.copytree(demo, project)
             before = digests(user)
-            env = {"APPDATA": str(appdata)}
+            env = {"APPDATA": str(appdata), "XDG_CONFIG_HOME": str(appdata)}
             with patch.dict(os.environ, env, clear=False):
                 os.environ.pop("KICAD_CONFIG_HOME", None)
                 process = run([cli(), "pcb", "drc", project / "ecc83-pp.kicad_pcb", "--output", project / "r.json"],
