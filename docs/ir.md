@@ -144,3 +144,31 @@ pin/etiket ve görünür alanlar sayfaya sığmalıdır. Metin kutuları yaklaş
 muhafazakârdır; glyph düzeyinde okunabilirlik kabulü verilmez. `text_box`, tablo,
 resim ve desteklenmeyen kök çizim öğeleri `unsupported_layout` ile reddedilir.
 Bu sınırlı tarif yazıcısı çoklu alt sayfa compiler, kalıcı eşleme veya artımlı IR apply değildir.
+
+## Pasif tarif simülasyonu (`spice_block_test`)
+
+`block` ve `params` alır; oturum veya kullanıcı şematiği gerekmez. Örnek:
+
+```json
+{"block":"rc_filter","params":{"r":"10k","c":"100nF","type":"highpass"}}
+```
+
+Yerleşik tarifin gerçek pin grupları ideal R/C netlistine çevrilir. Bölücü için DC
+çıkış gerilimi ve kaynak akımı; RC için kesimde genlik ve faz; debounce için 0,25/0,5/1/2/4
+zaman sabitindeki ideal şarj/deşarj yanıtı gerçek ngspice ile ölçülür. El hesabı aynı
+normalize girdileri kullanır. Her ölçüm beklenen değer, birim, hata, tolerans ve `passed`
+ile döner; fark varsa `passed=false`, `verified=simulation_mismatch` korunur.
+
+Tolerans yüzde 1; sıfır yakınında gerilim/genlik/faz için mutlak 1e-9, akım/frekans
+için 1e-15 tabanı vardır. Desteklenen R: 1e-3–1e12 Ω, C: 1e-15–1 F, RC: 1e-12–1e6 s,
+kaynak büyüklüğü en çok 1 MV. Aralık dışı girdiler simülatörden önce reddedilir.
+Kullanıcı metni SPICE satırına kopyalanmaz; yalnız doğrulanmış sayılar kullanılır.
+Koşu özel geçici klasörde, ayrı süreçte en çok 60 saniye sürer.
+Sıfır veya çok küçük kaynak denemesinde mutlak tolerans baskındır; böyle bir koşu tek
+başına tarif topolojisinin yeterli uyarıldığına dair kabul değildir.
+
+Özgün girdiler, tarif/testbench sürümü, netlist SHA-256 ve `source=simulated` ölçümler
+kanıta kaydedilir. Bu araç ideal tarif topolojisini sınar; kullanıcının şematiğini,
+parça modelini veya gerçek anahtar sekmesini doğrulamaz. `erc_verified`, `stock_verified`
+ve `physically_verified` false kalır; tarif olgunluğu 0. Olgunluk 1 kabulü ayrıca
+tarif ERC/CI ve diğer plan kapılarının tamamlanmasını gerektirir.

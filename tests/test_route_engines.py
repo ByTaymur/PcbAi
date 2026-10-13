@@ -40,6 +40,21 @@ def check(findings=()):
 
 
 class GuardTests(unittest.TestCase):
+    def test_place_zero_angle_omission_only_at_movable_footprint_position(self):
+        moved = plan_move(BOARD, "R1", 11, 10)["data"]
+        omitted = moved.replace(b'(at 11 10 0)', b'(at 11 10)')
+        self.assertTrue(guard(BOARD, omitted, operation='place')['clean'])
+        self.assertTrue(guard(BOARD.replace(b'(at 10 10 0)', b'(at 10 10)'), moved, operation='place')['clean'])
+        for changed in (omitted.replace(b'"1k"', b'"2k"'), omitted.replace(b'(net 1 "GND")', b'(net 1 "OTHER")'),
+                        omitted.replace(b'(at 0 0)', b'(at 0 0 0)'), omitted.replace(b'(at 11 10)', b'(at 11 10 90)')):
+            with self.subTest(changed=changed), self.assertRaises(PcbAiError):
+                guard(BOARD, changed, operation='place')
+        with self.assertRaises(PcbAiError):
+            guard(BOARD, omitted)
+        locked = BOARD.replace(b'(footprint "R"', b'(footprint "R" locked')
+        with self.assertRaises(PcbAiError):
+            guard(locked, omitted, operation='place')
+
     def test_route_accepts_only_added_copper_and_defined_net(self):
         self.assertTrue(guard(BOARD, via_board())["clean"])
         for changed in (via_board().replace(b'"1k"', b'"9k"'), via_board().replace(b'20241229', b'20260101'),

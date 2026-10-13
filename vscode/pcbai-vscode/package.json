@@ -2,7 +2,7 @@
   "name": "pcbai-vscode",
   "displayName": "PcbAi · KiCad",
   "description": "KiCad projeleri için PcbAi: kart ve şematik görünümü, işaretler, kart önizlemesi, ölçümler, ERC/DRC, şematik PDF, MCP kaydı.",
-  "version": "0.1.16",
+  "version": "0.1.18",
   "license": "LGPL-2.1-or-later",
   "publisher": "taymur",
   "engines": {
@@ -16,7 +16,34 @@
   ],
   "main": "./extension.js",
   "contributes": {
+    "jsonValidation": [{"fileMatch": ["*.pcbai-ir.json", "*.pcbai.json"], "url": "./schemas/circuit.schema.json"}],
+    "languages": [
+      {
+        "id": "kicad-dru",
+        "aliases": [
+          "KiCad Design Rules"
+        ],
+        "extensions": [
+          ".kicad_dru"
+        ],
+        "configuration": "./language-configuration/kicad-dru.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kicad-dru",
+        "scopeName": "source.kicad-dru",
+        "path": "./syntaxes/kicad-dru.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "kicad-dru",
+        "path": "./snippets/kicad-dru.json"
+      }
+    ],
     "commands": [
+      {"command": "pcbai.searchParts", "title": "Yerel parça ara", "category": "PcbAi"},
       {
         "command": "pcbai.start",
         "title": "Servisi başlat",
@@ -125,13 +152,15 @@
     }
   },
   "scripts": {
-    "test": "node test_extension.js && node test/sidebar.test.js",
+    "test": "node test_extension.js && node test/sidebar.test.js && node test/dru.test.js && node test/part_assist.test.js",
     "test:viewer": "node test/viewer.e2e.js",
     "test:sch": "node test/sch.e2e.js",
     "test:3d": "node test/view3d.e2e.js",
     "test:engines": "node test/engine.e2e.js"
   },
   "devDependencies": {
-    "playwright": "1.64.0"
+    "playwright": "1.64.0",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.2.0"
   }
 }

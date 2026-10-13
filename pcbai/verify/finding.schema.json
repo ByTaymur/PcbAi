@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PcbAi finding (RD-A1)",
+  "type": "object",
+  "required": ["finding_id", "source", "rule_id", "severity", "confidence", "evidence_source", "excluded", "items"],
+  "properties": {
+    "finding_id": {"type": "string", "pattern": "^(erc|drc|parity|engine|calibration|readback):.+:[0-9a-f]{12}(#[1-9][0-9]*)?$"},
+    "source": {"enum": ["erc", "drc", "parity", "engine", "calibration", "readback"]},
+    "rule_id": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["error", "warning", "info"]},
+    "confidence": {"enum": ["deterministic", "heuristic", "datasheet-backed"]},
+    "evidence_source": {"enum": ["kicad", "topology", "geometry", "calculation"]},
+    "excluded": {"type": "boolean"},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uuid": {"type": "string"},
+          "pos": {"type": "object", "properties": {"x": {"type": "number"}, "y": {"type": "number"}}},
+          "reference": {"type": "string"},
+          "pin": {"type": "string"},
+          "net": {"type": "string"},
+          "sheet": {"type": "string"}
+        }
+      }
+    },
+    "position_mm": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+    "message": {"type": "string"},
+    "evidence_id": {"type": "string"},
+    "group": {"type": "string"}
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity", "calibration", "readback"]}}},
+      "then": {"properties": {"confidence": {"const": "deterministic"}}}
+    },
+    {
+      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity"]}}},
+      "then": {"properties": {"evidence_source": {"const": "kicad"}, "severity": {"enum": ["error", "warning"]}}}
+    }
+  ]
+}

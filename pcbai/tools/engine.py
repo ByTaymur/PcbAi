@@ -2,6 +2,7 @@ import json
 import secrets
 import time
 import threading
+import tempfile
 from pathlib import Path
 
 from pcbai import __version__
@@ -40,7 +41,11 @@ from pcbai.sch.edit import hierarchy, plan_add_symbol, plan_labels, plan_replace
 from pcbai.blocks.registry import describe as describe_blocks
 from pcbai.blocks.compute import CALCULATIONS, calculate
 from pcbai.ir.plan import bounded_json, plan as plan_circuit
+from pcbai.verify.findings import normalize_findings
+from pcbai.verify.manifest import entry as check_entry, verification as checks_verification
+from pcbai.verify.audit import AuditLog, byte_count
 from pcbai.blocks.schematic import plan_block, measure_topology
+from pcbai.blocks.spice import test_block as spice_block_test
 
 
 PCB_EDITS = {"move_footprint", "set_track_width", "add_zone", "set_netclass", "autoroute", "autoplace"}
@@ -67,6 +72,8 @@ class Engine:
         self.state = validate_state_location(state, (s.root for s in self.sessions.entries.values()))
         self.history = History(self.state)
         self.evidence = Evidence(self.state)
+        self.audit = AuditLog(self.state)
+        self.audit_context = threading.local()
         self.candidates = {}
         self.stopping = False
         self.candidate_lock = threading.RLock()
@@ -105,6 +112,10 @@ class Engine:
             "passive block expansion and hand calculations. No schematic is written; electrical/stock/AF "
             "checks remain incomplete. Input text and library metadata are untrusted data.",
             {"ir": {"type": "object"}}, ["ir"])
+        add("spice_block_test", "Simulate a built-in passive recipe's ideal topology with bounded generated SPICE. "
+            "Compare against hand calculation; no project written, ERC/stock/hardware acceptance remains open.",
+            {"block": {"type": "string", "enum": ["voltage_divider", "rc_filter", "button_debounce"]},
+             "params": {"type": "object", "maxProperties": 16}}, ["block", "params"])
         add("search_parts", "Search a private FTS5 index of installed/configured KiCad symbol metadata. "
             "No catalogue/stock availability is implied; library text is untrusted data.",
             {"query": {"type": "string", "maxLength": 512}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}}, ["query"])
@@ -165,6 +176,8 @@ class Engine:
                  n={"type": "integer", "minimum": 1}, status={"type": "string", "enum": ["open", "done", "blocked"]},
                  reason=STRING, evidence_id=STRING, candidate_id=STRING),
             [*TARGET, "revision", "markers_revision", "mode"], write=True)
+        add("check", "Run required saved-file checks; missing or failed coverage is never clean.",
+            dict(session=STRING, scope={"type": "string", "enum": ["sch", "pcb", "all"]}), ["session"])
         add("erc", "Run real KiCad ERC on an isolated saved-project snapshot; returns measured findings.",
             read_target, TARGET)
         add("drc", "Run real KiCad DRC on a snapshot; warnings, unconnected and parity findings count.",
@@ -266,6 +279,29 @@ class Engine:
         return definitions
 
     def call(self, name, arguments, *, source="tool"):
+        started = time.monotonic()
+        previous = getattr(self.audit_context, "target", None)
+        self.audit_context.target = None
+        try:
+            output = self._dispatch_call(name, arguments, source=source)
+            before = self.audit_context.target
+        finally:
+            self.audit_context.target = previous
+        try:
+            target = output.get("target") or before or {}
+            known = any(d["name"] == name for d in self.definitions + self.view_definitions)
+            self.audit.append(dict(tool=name if known else "<unknown>", source=source if source in {"tool", "view", "job"} else "<unknown>",
+                seconds=time.monotonic() - started, input_bytes=byte_count(arguments), output_bytes=byte_count(output),
+                ok=output.get("ok"), verified=output.get("verified"), error_code=output.get("error", {}).get("code"),
+                session=target.get("session"), document=target.get("document"),
+                revision_before=(before or {}).get("revision"), revision_after=target.get("revision"),
+                evidence_id=output.get("evidence_id") or output.get("preview_evidence_id"), change_id=output.get("change_id"),
+                checkpoint_id=(output.get("checkpoint") or {}).get("id")))
+        except Exception:
+            output.setdefault("warnings", []).append("audit_write_failed: audit metadata could not be saved")
+        return output
+
+    def _dispatch_call(self, name, arguments, *, source="tool"):
         definitions = self.view_definitions if source == "view" else self.definitions
         definition = next((d for d in definitions if d["name"] == name), None)
         try:
@@ -284,6 +320,19 @@ class Engine:
                 return result("Optional external engines inspected", engines=describe_engines())
             if name == "circuit_blocks":
                 return result("Built-in passive recipes described", blocks=describe_blocks())
+            if name == "spice_block_test":
+                bounded_json(arguments)
+                with tempfile.TemporaryDirectory(prefix="block-spice-", dir=self.exports) as tmp:
+                    report = spice_block_test(arguments["block"], arguments["params"], Path(tmp))
+                report["original_inputs"] = arguments
+                measurements = [dict(name=c["name"], value=c["measured"], unit=c["unit"], source="simulated")
+                                for c in report["checks"]]
+                evidence = self.evidence.record(tool=name, target=None, inputs=arguments,
+                                                measurements=measurements, report=report)
+                response = result("Ideal recipe simulation compared with hand calculation",
+                                  verified=report["verification"], evidence_id=evidence["id"], **report)
+                response["measurements"] = [dict(m, id=evidence["id"]) for m in measurements]
+                return response
             if name in {"hand_calc", "plan_circuit"}:
                 bounded_json(arguments)
                 if name == "hand_calc":
@@ -326,9 +375,10 @@ class Engine:
                 job_definition = next(d for d in self.definitions if d["name"] == tool)
                 validate(job_definition["inputSchema"], job_args)
                 session = self.sessions.get(job_args["session"])
-                path, _ = session.validate(job_args["document"], job_args["revision"])
+                path, job_target = session.validate(job_args["document"], job_args["revision"])
+                self.audit_context.target = job_target
                 self._expect_kind(path, "erc" if tool in {"erc", "schematic_pdf", "render_sch", "simulate"} else "drc")
-                entry = self.jobs.submit(tool, job_args, lambda: self.call(tool, job_args))
+                entry = self.jobs.submit(tool, job_args, lambda: self.call(tool, job_args, source="job"))
                 return result("Background job submitted", target=entry["target"], job=entry)
             session = self.sessions.get(arguments["session"])
             with session.lock:
@@ -336,11 +386,35 @@ class Engine:
                     raise PcbAiError("service_stopping", "Service is shutting down")
                 return self._call(name, arguments, session)
         except PcbAiError as exc:
-            return error(exc)
+            output = error(exc)
+            if name in {"erc", "drc"}:
+                output["checks_run"] = self._failed_checks(name, arguments, exc.code)
+            return output
         except Exception as exc:
-            return error(PcbAiError("operation_failed", str(exc)))
+            output = error(PcbAiError("operation_failed", str(exc)))
+            if name in {"erc", "drc"}:
+                output["checks_run"] = self._failed_checks(name, arguments, "operation_failed")
+            return output
+
+    def _failed_checks(self, kind, args, reason):
+        from pcbai.kicad.files import project_files
+        inputs = None
+        try:
+            session = self.sessions.get(args["session"])
+            inputs = {p.relative_to(session.root).as_posix(): digest(p.read_bytes()) for p in project_files(session.root)}
+        except Exception:
+            pass
+        rows = [check_entry(kind, status="failed", reason=reason, inputs_sha256=inputs)]
+        if kind == "drc":
+            requested = args.get("parity", False)
+            rows.append(check_entry("schematic_parity", required=bool(requested),
+                status="failed" if requested else "skipped", reason=reason if requested else "not_requested",
+                inputs_sha256=inputs, tool="drc"))
+        return rows
 
     def _call(self, name, args, session):
+        if name == "check":
+            return self._check_all(args, session)
         if name == "get_markers":
             initial = revision(session.root)
             output = self.markers.get(session)
@@ -371,6 +445,7 @@ class Engine:
         if name == "design_history":
             return result("Document checkpoints", checkpoints=self.history.list(session.id))
         path, target = session.validate(args["document"], args.get("revision"))
+        self.audit_context.target = target
         data = path.read_bytes()
         session.validate(args["document"], target["revision"])
         if path.read_bytes() != data:
@@ -509,7 +584,7 @@ class Engine:
             return result("Saved PCB net inspected", target=target, **net_info(data, args["net"]))
         if name in {"erc", "drc"}:
             self._expect_kind(path, name)
-            check = rule_check(session.root, args["document"], name, parity=args.get("parity", False),
+            check = self._rule_check(session.root, args["document"], name, parity=args.get("parity", False),
                                expected_revision=target["revision"])
             session.validate(args["document"], target["revision"])
             return self._check_result(name, target, check)
@@ -601,8 +676,19 @@ class Engine:
                     if len(self.candidates) >= 100:
                         raise PcbAiError("too_many_candidates", "Apply/discard previews or wait for expiry")
                     identity = "candidate-" + secrets.token_hex(16)
+                    from pcbai.verify.readback import freeze
+                    context = hierarchy(session, args["document"]) if name in SCH_EDITS else None
+                    if name == "set_value":
+                        project, root_uuid = self._schematic_context(session)
+                        context = dict(project=project, root_uuid=root_uuid)
+                    original_netlist = None
+                    if name == "connect":
+                        with snapshot(session.root, target["revision"]) as copy:
+                            original_netlist = parse_netlist(export_netlist(copy, context["check_document"], copy / "before.xml"))
+                    checkpoint_bytes = self.history.read(args["checkpoint_id"], session.id, args["document"]) if name == "restore_checkpoint" else None
+                    intent = freeze(name, args, data, impact, changed, context, original_netlist, checkpoint_bytes)
                     self.candidates[identity] = dict(tool=name, target=target, data=changed, summary=summary,
-                                                     impact=impact,
+                                                     impact=impact, intent=intent,
                                                      before_sha256=digest(data), expires=time.monotonic() + 900)
                 return result(summary, target=target, candidate_id=identity, mode="preview",
                               before_sha256=digest(data), after_sha256=digest(changed),
@@ -621,8 +707,8 @@ class Engine:
         else:
             plan = plan_labels(data, args, context, connect=name == "connect")
         root = context["check_document"]
-        before = rule_check(session.root, root, "erc", expected_revision=target["revision"])
-        after = rule_check(session.root, root, "erc", override=plan["data"], override_document=args["document"],
+        before = self._rule_check(session.root, root, "erc", expected_revision=target["revision"])
+        after = self._rule_check(session.root, root, "erc", override=plan["data"], override_document=args["document"],
                            expected_revision=target["revision"])
         impact = {k: v for k, v in plan.items() if k != "data"}
         impact.update(check_document=root, erc_before=dict(errors=before["errors"], warnings=before["warning_count"]),
@@ -699,8 +785,8 @@ class Engine:
                        f"{fills} filled areas")
             impact = dict(zone_uuid=plan["uuid"], net=args["net"], layer=args["layer"], filled_polygons=fills,
                           outline_area_mm2=round(plan["area_mm2"], 3))
-        before = rule_check(session.root, board, "drc", expected_revision=target["revision"])
-        after = rule_check(session.root, board, "drc", override=plan["data"], override_document=override_document,
+        before = self._rule_check(session.root, board, "drc", expected_revision=target["revision"])
+        after = self._rule_check(session.root, board, "drc", override=plan["data"], override_document=override_document,
                            expected_revision=target["revision"])
         impact.update(drc_before=dict(errors=before["errors"], warnings=before["warning_count"]),
                       drc_after=dict(errors=after["errors"], warnings=after["warning_count"]),
@@ -727,7 +813,7 @@ class Engine:
         input_data = data
         if Document(data).root.all("zone"):
             input_data = replace_fills(data, refill(session.root, args["document"], data, target["revision"]))
-        before = rule_check(session.root, args["document"], "drc", override=input_data,
+        before = self._rule_check(session.root, args["document"], "drc", override=input_data,
                             expected_revision=target["revision"])
         from pcbai.kicad.files import within
         project_data = within(session.root, session.project).read_bytes()
@@ -743,7 +829,7 @@ class Engine:
         if Document(changed).root.all("zone"):
             changed = replace_fills(changed, refill(session.root, args["document"], changed, target["revision"]))
         outcome["candidate_sha256"] = digest(changed)
-        after = rule_check(session.root, args["document"], "drc", override=changed,
+        after = self._rule_check(session.root, args["document"], "drc", override=changed,
                            expected_revision=target["revision"])
         outside = outside_footprints(changed, protected["moved"])
         errors = added_errors(before, after)
@@ -824,6 +910,83 @@ class Engine:
         if path.suffix != suffix:
             raise PcbAiError("invalid_document", f"This tool requires a {suffix} document")
 
+    def _rule_check(self, root, document, kind, **kwargs):
+        started = time.monotonic()
+        check = rule_check(root, document, kind, **kwargs)
+        from pcbai.kicad.files import project_files
+        inputs = {p.relative_to(root).as_posix(): digest(p.read_bytes()) for p in project_files(root)}
+        if kwargs.get("override") is not None:
+            inputs[kwargs.get("override_document") or document] = digest(kwargs["override"])
+        rows = [check_entry(kind, inputs_sha256=inputs, tool=kind,
+                            tool_version=self._check_tool_version(), seconds=time.monotonic() - started)]
+        if kind == "drc":
+            requested = kwargs.get("parity", False)
+            rows.append(check_entry("schematic_parity", required=requested,
+                status="ran" if requested else "skipped", reason=None if requested else "not_requested",
+                inputs_sha256=inputs, tool="drc", tool_version=rows[0]["tool_version"], seconds=rows[0]["seconds"]))
+        return dict(check, findings=normalize_findings(check["findings"], kind), checks_run=rows)
+
+    def _check_tool_version(self):
+        from pcbai.external import run
+        try:
+            cli = find_kicad_cli()
+            if getattr(self, "check_tool_path", None) != cli:
+                output = run([cli, "--version"], timeout=15)
+                self.check_tool_version = output.stdout.strip() if output.returncode == 0 else None
+                self.check_tool_path = cli
+        except PcbAiError:
+            return None
+        return self.check_tool_version
+
+    def _check_all(self, args, session):
+        from pcbai.kicad.files import project_files
+        scope = args.get("scope", "all")
+        initial = revision(session.root)
+        checks, findings, outputs = [], [], {}
+        plan = []
+        stem = Path(session.project)
+        if scope in {"sch", "all"}:
+            plan.append(("erc", "erc", stem.with_suffix(".kicad_sch").as_posix(), {}))
+        if scope in {"pcb", "all"}:
+            document = stem.with_suffix(".kicad_pcb").as_posix()
+            plan.extend([("drc", "drc", document, {}), ("schematic_parity", "drc", document, {"parity": True}),
+                         ("board_stats", "board_stats", document, {})])
+        from pcbai.kicad.files import within
+        for identifier, tool, document, extra in plan:
+            started = time.monotonic()
+            path = within(session.root, document, must_exist=False)
+            if not path.is_file() or (identifier == "schematic_parity" and
+                    not within(session.root, stem.with_suffix(".kicad_sch").as_posix(), must_exist=False).is_file()):
+                output = None
+                status, reason = "skipped", "document_missing"
+            else:
+                try:
+                    session.validate(document, initial)
+                    output = self.call(tool, dict(session=session.id, document=document, **extra))
+                    status = "ran" if output["ok"] else "failed"
+                    reason = None if output["ok"] else output.get("error", {}).get("code", "operation_failed")
+                except Exception as exc:
+                    output = error(exc)
+                    status, reason = "failed", output["error"]["code"]
+                outputs[identifier] = output
+                # Parity has its own run; don't double-count the ordinary DRC violations in that report.
+                rows = output.get("findings", [])
+                if identifier == "schematic_parity":
+                    rows = [row for row in rows if row.get("source") == "parity"]
+                findings.extend(rows)
+            inputs = {p.relative_to(session.root).as_posix(): digest(p.read_bytes())
+                      for p in project_files(session.root)}
+            checks.append(check_entry(identifier, status=status, reason=reason, inputs_sha256=inputs,
+                                      tool=tool, tool_version=self._check_tool_version(), seconds=time.monotonic() - started))
+        if revision(session.root) != initial:
+            for row in checks:
+                row.update(status="failed", reason="stale_revision")
+        verified = checks_verification(checks, findings)
+        evidence = self.evidence.record(tool="check", target=dict(session=session.id, revision=initial), inputs=args,
+                                        measurements=[], report=dict(checks_run=checks, findings=findings, results=outputs))
+        return result(f"{verified}: " + ", ".join(f"{r['check_id']}={r['status']}" for r in checks),
+                      verified=verified, checks_run=checks, findings=findings, results=outputs, evidence_id=evidence["id"])
+
     def _check_result(self, kind, target, check):
         values = [{"quantity": kind + "_errors", "value": check["errors"], "unit": "count"},
                   {"quantity": kind + "_warnings", "value": check["warning_count"], "unit": "count"}]
@@ -831,7 +994,11 @@ class Engine:
                                         measurements=values, report=check["report"])
         response = result(f"{kind.upper()}: {check['errors']} errors, {check['warning_count']} warnings",
                           target=target, verified=kind + ("_ok" if check["clean"] else "_findings"),
-                          findings=check["findings"], evidence_id=evidence["id"])
+                          findings=normalize_findings(check["findings"], kind, evidence_id=evidence["id"]),
+                          evidence_id=evidence["id"])
+        response["checks_run"] = check.get("checks_run", [])
+        if kind == "drc" and any(row["reason"] == "not_requested" for row in response["checks_run"]):
+            response["summary"] = "DRC (parite istenmedi): " + f"{check['errors']} hata, {check['warning_count']} uyarı"
         response["measurements"] = [dict(v, id=evidence["id"]) for v in values]
         if check.get("excluded_count", 0):
             response["warnings"].append(f"{check['excluded_count']} excluded/ignored findings require review")
@@ -860,7 +1027,7 @@ class Engine:
                 return result("Document already matches preview", target=target, **candidate["impact"])
             kind = "erc" if path.suffix == ".kicad_sch" else "drc"
             checked = candidate["impact"].get("check_document", args["document"])
-            gate = rule_check(session.root, checked, kind, override=candidate["data"],
+            gate = self._rule_check(session.root, checked, kind, override=candidate["data"],
                               override_document=args["document"], expected_revision=target["revision"])
             limit = candidate["impact"].get("drc_before", {}).get("errors")
             if name in ENGINE_EDITS:
@@ -887,22 +1054,60 @@ class Engine:
             atomic_write(path, candidate["data"])
             with self.candidate_lock:
                 self.candidates.pop(identity, None)
-            updated = session.target(args["document"])
             change_id = None
+            from pcbai.verify.readback import measure
+            try:
+                updated = session.target(args["document"])
+                from pcbai.kicad.files import within
+                saved_path = within(session.root, args["document"])
+            except Exception as exc:
+                from pcbai.verify.findings import normalize_findings
+                findings = normalize_findings([dict(type="readback_mismatch", severity="error", group="saved_target",
+                    description="Saved document cannot be safely accessed", items=[])], "readback")
+                readback = dict(checked=["saved_target"], mismatches=[dict(check="saved_target",
+                    error_code=getattr(exc, "code", "readback_failed"))], findings=findings)
+                try:
+                    change_id = self.evidence.record(tool=name, target=target, inputs=args, measurements=[],
+                        report=dict(changed=True, checkpoint_id=cp["id"], before_sha256=digest(before),
+                            candidate_sha256=digest(candidate["data"]), target_after_available=False,
+                            readback=readback))["id"]
+                except Exception:
+                    pass
+                response = error(PcbAiError("readback_mismatch", "Edit saved; saved document cannot be safely accessed"))
+                response.update(changed=True, verified="readback_mismatch", checkpoint=cp, target=None,
+                    target_before=target, change_id=change_id, readback=readback, findings=findings,
+                    suggested_restore=dict(tool="restore_checkpoint", session=session.id, document=args["document"],
+                        checkpoint_id=cp["id"], requires="Refresh the saved target before creating a restore preview"))
+                return response
+            def saved_netlist():
+                with snapshot(session.root, updated["revision"]) as copy:
+                    return parse_netlist(export_netlist(copy, checked, copy / "readback.xml"))
+            readback = measure(saved_path, digest(candidate["data"]), candidate["intent"], saved_netlist, session.root)
             try:
                 change = self.evidence.record(tool=name, target=updated, inputs=args, measurements=[],
                     report=dict(changed=True, before_sha256=digest(before), after_sha256=digest(candidate["data"]),
-                                checkpoint_id=cp["id"], summary=candidate["summary"]))
+                                checkpoint_id=cp["id"], summary=candidate["summary"], readback=readback))
                 change_id = change["id"]
-                check = rule_check(session.root, checked, kind, expected_revision=updated["revision"])
+                if readback["mismatches"]:
+                    response = error(PcbAiError("readback_mismatch", "Edit saved; disk readback differs from preview or intent"))
+                    response.update(changed=True, verified="readback_mismatch", target=updated, checkpoint=cp,
+                                    change_id=change_id, readback=readback, findings=readback["findings"],
+                                    suggested_restore=dict(tool="restore_checkpoint", arguments=dict(updated,
+                                        mode="preview", checkpoint_id=cp["id"])))
+                    return response
+                check = self._rule_check(session.root, checked, kind, expected_revision=updated["revision"])
                 session.validate(args["document"], updated["revision"])
                 response = self._check_result(kind, updated, check)
-                response.update(changed=True, summary=candidate["summary"], checkpoint=cp, change_id=change_id)
+                response.update(changed=True, summary=candidate["summary"], checkpoint=cp, change_id=change_id, readback=readback)
                 response["warnings"].extend(candidate["impact"].get("warnings", []))
                 response.update({k: v for k, v in candidate["impact"].items() if k != "warnings"})
                 return response
             except Exception as exc:
                 response = result(candidate["summary"], changed=True, target=updated, checkpoint=cp, change_id=change_id,
-                                  verified="verification_failed", **candidate["impact"])
+                                  verified="verification_failed", readback=readback, **candidate["impact"])
+                if readback["mismatches"]:
+                    response.update(ok=False, verified="readback_mismatch", findings=readback["findings"],
+                                    error=dict(code="readback_mismatch"), suggested_restore=dict(tool="restore_checkpoint",
+                                        arguments=dict(updated, mode="preview", checkpoint_id=cp["id"])))
                 response["warnings"].append(f"Edit saved, verification failed: {exc}")
                 return response

@@ -1,7 +1,7 @@
 # PcbAi
 
 KiCad projesini yapay zekâ ajanlarına yerel MCP araçlarıyla açan Python çekirdeği.
-Mevcut çekirdek **0.1.11**, VS Code eklentisi **0.1.16**: kayıtlı şematik/kart ve salt okunur canlı PCB, gerçek ERC/DRC,
+Mevcut çekirdek **0.1.14**, VS Code eklentisi **0.1.16**: kayıtlı şematik/kart ve salt okunur canlı PCB, gerçek ERC/DRC,
 PDF/PNG, PCB ölçümleri, temel Gerber/delik ZIP, arka plan işleri, önizlemeli değer değişikliği,
 checkpoint ve geri yükleme; etkileşimli kart katmanları, seçim ve kalıcı PCB işaretleri. [Ürün planı](PLAN.md)
 ile [uygulama durumu](docs/status.md) ayrı tutulur.
@@ -22,6 +22,10 @@ elektriksel kabul eksik, bloklar olgunluk 0. [IR v1 sözleşmesi ve örnek](docs
 `add_block`, üç pasif tarifi tek şematik adayında oluşturur: sabit kütüphane baytları,
 toplu anotasyon, gerçek netlerin tam üye kontrolü ve tek checkpoint/geri yükleme.
 Netler yalıtılmış yerel adlardır; mevcut netlere bağlantı ve tam IR compiler ayrı işlerdir.
+
+`spice_block_test`, bu üç pasif tarifin altı varyantını gerçek ngspice ile el hesabına
+kıyaslar; ölçülen hata ve tolerans kanıta kaydedilir. İdeal simülasyon ERC, stok veya
+fiziksel kabul sağlamaz; blok olgunluğu 0 kalır. [Girdiler ve sınırlar](docs/ir.md).
 
 Çekirdek güncellemesinden sonra eski servisi `python -m pcbai stop` ile durdurup yeniden başlatın;
 çalışan eski süreç yeni araçları otomatik yüklemez.

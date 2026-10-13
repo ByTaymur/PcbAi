@@ -6,13 +6,12 @@ from pcbai.core.contract import PcbAiError
 from pcbai.kicad.board import board
 from pcbai.pcb.engine_guard import canonical_uuid
 from pcbai.views import arc_points, graphic_points, scene_pcb, xy
+from pcbai.verify.findings import comparison_id
 
 
 def finding_key(finding):
-    # Group is significant: parity and unconnected errors must not disappear in a count comparison.
-    items = tuple(sorted((str(i.get("uuid", "")), tuple(sorted(i.get("pos", {}).items())))
-                         for i in finding.get("items", [])))
-    return finding.get("group"), finding.get("type"), finding.get("severity"), items
+    # Duplicate row suffixes may change as rows are added/removed; Counter keeps their multiplicity.
+    return comparison_id(finding)
 
 
 def active_errors(check):

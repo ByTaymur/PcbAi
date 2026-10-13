@@ -1,6 +1,6 @@
 # PcbAi — problemden karta yapay zekâ destekli elektronik tasarım (KiCad)
 
-Tarih: 13 Ekim 2026 · Durum: **plan v1.1 + çekirdek 0.1.11** (faz kabulleri açık; [uygulama durumu](docs/status.md)) · Kardeş proje: CadAI (ayrı depo, FreeCAD/Fusion).
+Tarih: 13 Ekim 2026 · Durum: **plan v1.1 + çekirdek 0.1.22** (faz kabulleri açık; [uygulama durumu](docs/status.md)) · Kardeş proje: CadAI (ayrı depo, FreeCAD/Fusion).
 PcbAi, CadAI'da işe yarayan yaklaşımı KiCad'e taşır; CadAI'ın koduna ve klasör yapısına dokunmaz.
 
 **Bu belge:** 0 özet · 1–2 ne ve neden · 3–5 nasıl çalışacak (mimari, veri sözleşmeleri, alt sistemler) · 6–7 nasıl
@@ -372,6 +372,8 @@ Ağır değişikliklerde önizleme/uygulama ayrımı: `apply_circuit`, `place_co
 
 **12 Ekim uygulama farkı:** kapalı v1 şema/SI ayrıştırıcı, yerel literal pin/pad/net ön denetimi,
 `plan_circuit`, üç olgunluk-0 pasif tarif ve sekiz `hand_calc` hesabı mevcut.
+**13 Ekim farkı:** `spice_block_test` bu üç tarifin ideal topolojisini gerçek ngspice ile
+el hesabına kıyaslar; olgunluk/şematik/ERC/CI ve fiziksel kabul kapıları açık kalır.
 [Gerçek sözleşme](docs/ir.md), [ölçümler](docs/status.md). Aşağıdaki tam ürün örneği/hedefi
 henüz desteklenmiyor: buck/STM32/USB/röle, stok/AF/güç bütçesi, çoklu sayfa apply kabulü açık.
 

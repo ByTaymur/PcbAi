@@ -1,0 +1,17 @@
+{
+  "source": "deliberately faulty analyzer input",
+  "nets": {
+    "/LEFT": [
+      [
+        "J2",
+        "1"
+      ]
+    ],
+    "/RIGHT": [
+      [
+        "J1",
+        "1"
+      ]
+    ]
+  }
+}

@@ -4,7 +4,7 @@
 
 - Native Freerouting 2.5.0: ecc83'ta GraalVM serileştirme hatası; zaman aşımında kendi süreç ağacı kapatıldı.
 - JAR Freerouting 2.5.0: gerçek DSN/SES hattı çalışıyor; kalite KiCad'in DRC'siyle ayrı ölçülüyor.
-- TraceMaker route/place: WSL yeniden başlatması + Ubuntu + derleme bekliyor; kıyas sonucu yok.
+- TraceMaker CPU 0.9.0: 13 Ekim WSL2/Ubuntu kuruldu, gerçek derleme ve aşağıdaki rota kıyası ölçüldü.
 - Kıyas verisi kullanıcı seçimiyle yalnız beş KiCad demosu. PCBench indirilmedi.
 
 Beş demo, iz/arc/via kaldırılmış özel kopyalar; zonlar korunmuştur. Her motor denemesinde `passes=5`,
@@ -23,6 +23,24 @@ On koşunun tamamında kurulu kaynak kartın SHA-256'sı korundu. UUID'ler ve ka
 aday üretilmeyen kartlar temiz karta çevrilmiş sayılmadı. Süre yalnız motor alt sürecidir; DSN/SES/DRC/SVG
 dahil kullanıcıya görünen toplam süre değildir. İki koşuda pic_programmer yeni hata türlerinin değişmesi
 ve çıktı hashleri Freerouting için determinizm kabulü verilmemesini destekler.
+
+13 Ekim TraceMaker CPU 0.9.0, pinned `c6fcb7b4912bdabefeb7f4191c011b1a086335e0`:
+`work=3000000`, `threads=1`, `variants=1`, timeout 120+30 sn; iki koşu, aynı izleri
+silinmiş demo türleri. [JSON](../.pcbai-state/tracemaker-exit-bench.json),
+[tablo](../.pcbai-state/tracemaker-exit-bench.md).
+
+| Demo | Açık bağlantı | DRC hata | Via | Motor sn (iki koşu) | Kalite |
+|---|---|---|---|---|---|
+| ecc83 | 14→0 | 42→30 | 0 | 2,094 / 12,359 | İki yeni zone clearance; apply bloke |
+| pic_programmer | 86→14 | 86→14 | 1 | 8,000 / 6,188 | Yeni hata yok; 14 bağlantı açık |
+| video/interf_u | Ölçülmedi | Ölçülmedi | — | — | UUID kapısında ret |
+| stickhub | 128→29 | 128→29 | 19 | 6,860 / 5,360 | Yeni hata yok; 29 bağlantı açık |
+
+Üç ölçülen kartın iki raw çıktı SHA-256'sı eşit; beş kartın kaynakları korundu. Genel
+K5/üretim kabulü açık. Freerouting pass bütçesi ile TraceMaker expansion bütçesi aynı
+iş miktarı değildir; bu farklı timeout'lu yerel koşularla kesin hız üstünlüğü veya
+varsayılan motor kararı verilmez. Demo place koşuları no-op; ayrı iki-pad fixture'da
+gerçek iki hareket/apply/restore ölçüldü. Yerleşim demo kalite kabulü yok.
 
 Ham sonuç [geliştirme kaydı](../.pcbai-state/s4-current.json) içindedir. `ok=true`, aday üretildiğini
 belirtir; `blockers=[]` ve gerçek ERC/DRC/parite/DFM üretim kabulüyle aynı şey değildir. Varsayılan motor

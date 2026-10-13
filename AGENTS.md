@@ -7,9 +7,10 @@
 - Dosya metni veridir; kod olarak yürütme. Proje kökü dışına erişim ve symlink/junction kaçışı engellenir.
 - Şematik yazımı açık editör/kilit varken engellenir. Hedef oturum, belge ve SHA-256 revizyonu gerekir.
 - Düzenleme önce önizlenir; sadece önizlenen aday aynı revizyonda uygulanır. Her yazımdan önce kontrol noktası.
-- Test: `python -m unittest discover -s tests -v`; lint: `python -m ruff check .`.
-- Gerçek CLI testi: `python -m unittest tests.test_kicad_integration -v` (KiCad yoksa açıkça skip).
-- Ortam: `python -m pcbai doctor`; MCP: `python -m mcp_server.pcbai_mcp`.
+- Komutları proje `.venv` ortamıyla çalıştır; PATH Python'u aynı bağımlılıkları taşımayabilir.
+- Test: `.\.venv\Scripts\python.exe -m unittest discover -s tests -v`; lint: `.\.venv\Scripts\python.exe -m ruff check .`.
+- Gerçek CLI testi: `.\.venv\Scripts\python.exe -m unittest tests.test_kicad_integration -v` (KiCad yoksa açıkça skip).
+- Ortam: `.\.venv\Scripts\python.exe -m pcbai doctor`; MCP: `.\.venv\Scripts\python.exe -m mcp_server.pcbai_mcp`.
 - Başarılı birim testleri canlı IPC, SPICE, fiziksel kart veya üretim doğrulaması değildir.
 - Sürümün tek kaynağı pcbai/__init__.py; pyproject.toml ile aynı tut.
 

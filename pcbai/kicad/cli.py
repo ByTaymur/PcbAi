@@ -8,6 +8,7 @@ from pcbai.core.contract import PcbAiError
 from pcbai.external import find_kicad_cli, run
 from pcbai.kicad.files import project_files, revision, within
 from pcbai.sexpr import Document
+from pcbai.verify.findings import normalize_findings
 
 
 @contextmanager
@@ -78,7 +79,8 @@ def rule_check(root, document, kind, *, parity=False, override=None, expected_re
             raise PcbAiError("invalid_report", "Unknown finding severity; check cannot be certified")
         if process.returncode == 5 and not findings:
             raise PcbAiError("invalid_report", "KiCad reported violations but its report contains no findings")
-        return dict(errors=errors, warning_count=warnings, excluded_count=excluded, findings=findings, report=report,
+        return dict(errors=errors, warning_count=warnings, excluded_count=excluded,
+                    findings=normalize_findings(findings, kind), report=report,
                     exit_code=process.returncode, clean=errors == 0 and warnings == 0 and excluded == 0)
 
 

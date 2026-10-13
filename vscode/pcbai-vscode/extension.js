@@ -290,6 +290,23 @@ async function refreshStatus() {
 }
 
 const commands = {
+  async 'pcbai.searchParts'() {
+    await pickSession();
+    const query = await vscode.window.showInputBox({prompt: 'Yerel KiCad sembolü ara (ad/açıklama)', validateInput: value => value.trim().length > 0 && value.length <= 512 ? undefined : '1–512 karakter girin'});
+    if (query === undefined) return;
+    const searched = await call('search_parts', {query, limit: 50});
+    if (!searched.ok) throw new Error(searched.summary);
+    const selected = await vscode.window.showQuickPick(searched.parts.map(p => ({label: p.lib_id, description: p.description, part: p})), {placeHolder: 'Yerel parça · stok/datasheet kabulü yok'});
+    if (!selected) return;
+    const info = await call('part_info', {lib_id: selected.part.lib_id, kind: 'symbol'});
+    if (!info.ok) throw new Error(info.summary);
+    const footprint = info.part.properties?.Footprint;
+    const verification = footprint ? await call('verify_part', {symbol: selected.part.lib_id, footprint}) : {summary: 'Footprint kaynağı yok; pin/pad kontrolü yapılmadı'};
+    const document = await vscode.workspace.openTextDocument({language: 'json', content: JSON.stringify({part: info.part, pin_pad: verification,
+      limitations: ['Yerel kütüphane verisi; stok/datasheet/üretim kabulü değildir.']}, null, 2)});
+    await vscode.window.showTextDocument(document);
+    return {part: info.part, verification};
+  },
   'pcbai.autoroute': () => engineCommand('autoroute'),
   'pcbai.autoplace': () => engineCommand('autoplace'),
   async 'pcbai.viewEmpty'() {
@@ -441,12 +458,26 @@ async function sessionFor(interactive, change = false) {
   return sessions.length === 1 ? sessions[0] : null;
 }
 
+// IR assistance selects a registered root from the document, without KiCad settings, prompts or service start.
+async function assistSessionFor(_interactive, document) {
+  try {
+    const status = await call('pcbai_status');
+    const sessions = (status.sessions || []).filter(s => require('./part_assist').inProject(document, s));
+    if (sessions.length === 1) return sessions[0];
+    const remembered = extensionContext?.globalState.get('pcbai.project');
+    return sessions.find(s => remembered && samePath(path.join(s.root, s.project), remembered)) || null;
+  } catch (_) {return null;}
+}
+
 function activate(context) {
   extensionContext = context;
   output = vscode.window.createOutputChannel('PcbAi');
   statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
   statusItem.show();
   context.subscriptions.push(output, statusItem);
+  if (vscode.languages?.registerCompletionItemProvider && vscode.languages?.registerHoverProvider) {
+    require('./part_assist').register(context, {call, sessionFor: assistSessionFor});
+  }
   if (vscode.window.registerWebviewViewProvider) {
     require('./sidebar_view').registerSidebar(context, { call, sessionFor });
   }

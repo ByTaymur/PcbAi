@@ -1,8 +1,352 @@
 # Uygulama durumu — 13 Ekim 2026
 
-Çekirdek sürümü **0.1.11**, kurulu VS Code eklentisi **0.1.16**, önceki KiCad PCM paketi `pcbai-kicad-0.1.5.zip`.
+Çekirdek sürümü **0.1.22**, kurulu VS Code eklentisi **0.1.16**, son üretilen KiCad PCM arşivi
+`pcbai-kicad-0.1.14.zip` (ZIP metaverisi 0.1.14; kurulum/kabul K-3 ayrı ve açık).
 Bu numaralar **PLAN.md Faz 1 kabulünün tamamlandığı** anlamına gelmez.
 Plan 30 haftalık ürün hedefidir; kalan işler aşağıda açıkça ayrılmıştır.
+
+## EK-2 — IR parça/pin yardımı, dal ip/ek2-parca-yardimi
+
+VS Code geliştirme paketi **0.1.18**, çekirdek **0.1.22** değişmedi. Yalnız
+`*.pcbai-ir.json`/`*.pcbai.json` için yerel schema, symbol/footprint/literal pin
+tamamlama ve düz metin hover; yeni yerel parça arama komutu salt okunur JSON
+sekmesinde pin/pad kontrolünü gösterir. Genel footprint arama indeksi yok;
+alternatif sembolün yerel Footprint alanıyla sınırlıdır. Provider servis başlatmaz.
+
+Tampon byte/node/depth/string sınırları; URI/version/session/revision iptali;
+her istekte taze kütüphane SHA okumaları ve SHA kapsamlı sunum cache'i var.
+Gerçek kök/parent çözümlemesi mevcut ve dangling junction kaçışlarını reddeder;
+unpaired surrogate reddedilir. Bağımsız denetim bu kök kaçışlarını ve widget
+filterText boşluğunu buldu; düzeltmeler regresyonlara eklendi. Geniş indeks
+güncellik kontrolü performans için gevşetilmedi.
+
+Paketlenmiş, yalıtılmış VS Code **1.90.2** + özel gerçek serviste sembol/hover,
+01/1, iki birim+ortak pin, footprint kaynağı, SHA değişimi ve zararlı Markdown
+kaçışı geçti. Yanlış lib/pin için gerçek öneri widget'ından alternatif kabulü
+ayrıca ölçülür. İki kütüphane korpusunda 3 warmup+10 örnek p95 **52,96 ms**.
+223 özel kopya kütüphane (kurulumda 244.306.544 bayt; SHA testi sonra özel fixture'ı
+değiştirir) nihai ölçümünde p95 **374,23 ms**, indeks ön yükleme **35,781 sn**:
+**150 ms hedefi karşılanmadı**. Küçük korpus sonucu geniş kabul diye sunulmaz.
+
+20 hedefli Python testi OK (19 geçti, EK-1 bozuk DRU ret kabulü 1 açık skip),
+Son tekrarda **11,134 sn**; dört JS regresyonu, Ruff ve lisans denetimi temiz.
+Bağımsız denetçi kök/dangling junction, Unicode ve widget filtreleme bulgularının
+düzeltmelerini teyit etti; Python 9/9 ve Node kontrollerini kendisi geçti.
+Yeni arama komutunun araç sırası/mock UI akışı testlidir; gerçek quick-pick UI
+uçtan uca kabulü bu Host senaryosunda ölçülmedi. Bu koşu tam
+çekirdek takım, canlı IPC, SPICE veya üretim kabulü değildir. Kanıtlar worktree
+`.pcbai-state/eklenti-ozellikleri/` altında; yayın JSON'u yazılmadı.
+
+## EK-1 — DRU editörü, dal ip/ek1-dru
+
+VS Code 0.1.17: özgün DRU TextMate grammar, yorum/parantez/folding ve beş
+düzenlenebilir clearance/track/via/keepout/skew şablonu. Statik katkılar VSIX'e
+dahil; çekirdek 0.1.22 değişmedi. Gerçek TextMate+Oniguruma scope testi ve
+mevcut JS regresyonları geçti. Yalıtılmış, paketten açılan VS Code 1.90.2
+Host'unda dil seçimi, snippet ekleme ve folding geçti; kullanıcı kurulumu değişmedi.
+KiCad 10.0.4 kopyası geçerli özel kuralı uygular; bozuk kuralda CLI exit 0
+ve temel DRC bulguları dönebilir. Bu ret kabulü tamamlanmadı; test açık skip
+ve ham çıktıyla sınırı kaydeder. Renklendirme/DRC exit kodu syntax validator değildir.
+Geliştirme kanıtı worktree `.pcbai-state/eklenti-ozellikleri/`; yayın JSON'u yok.
+Son hedefli ölçüm: 4 Python testi OK (3 geçti, 1 açık ret-kabul skip),
+10,467 sn; Ruff exit 0. Bağımsız denetçinin yakaladığı geçersiz `via_drill`
+şablonu `hole_size` olarak düzeltildi; gerçek KiCad testinde beş şablonun
+yanına eklenen isimli pozitif clearance kuralının uygulanması artık zorunlu.
+Yalnız CLI exit 0 beş şablon için de kabul sayılmaz.
+
+## EK-0 — 13 Ekim, dal ip/ek0-uyumluluk
+
+Kaynak/commit/lisans ve minimum API matrisi [EK0](spikes/EK0.md) içinde.
+44 gerçek Gerber PyGerber 2.4.3 strict parse+bbox; 6 Excellon açık skipped;
+mm/inç/yay-negatif fixture'ları okundu, bozuk dosya reddedildi. Altı özel demo
+kopyasının export öncesi/sonrası revizyonları eşit. Ürün bağımlılığı/kod alımı yok.
+Ruff exit 0; kurulu Host güncelleme mutex'inde çalıştırılamadı. Yalıtılmış
+portable 1.90.2 gerçek Host'unda eklenti açıldı ve provider API'leri doğrulandı;
+bu API keşfi dil/IR teslim kabulü değildir.
+EK-1/2 ve gerçek Host kabulleri henüz açık. Yayın kanıtı yazılmadı.
+Bağımsız salt okunur denetçi 10 kaynak metadatasının SHA'sını, 44/6 korpus
+sayımını ve mm/bozuk PyGerber probe'unu doğruladı; Viewer lisans satırı düzeltildi.
+İki mevcut VS Code testi OK (0,218 sn); tam takım bu belge paketinde tekrar koşulmadı.
+
+## Dal entegrasyonu — 13 Ekim
+
+- Tüm `ip/*` dalları tek doğrusal zincirdi; `main` bu zincirin ucuna (RD-A3, `afb140d`) ilerletildi,
+  `ip/gizlilik` (yerel ev yolu temizliği, `scripts/export_public.py`) ve `ip/rd-cli-denetim-duzeltmeleri`
+  (0.1.22) `--no-ff` ile birleştirildi. Tek çatışma PLAN.md başlık satırıydı. Birleşen dallar ve
+  `PcbAi-gizlilik` worktree'si silindi (yalnız önbellek dosyaları vardı); depoda tek dal `main`.
+- 0.1.22 birleşik ağaç `.venv` tam takım: **342 test OK, 11 skip**, **565,773 sn**; Ruff exit **0**.
+  Skip'ler: 7 gerçek yazım testi (KiCad açıktı), symlink yetkisi, yapılandırılmamış Freerouting/TraceMaker
+  (2) ve kicad-happy. Takip edilen dosyalarda yerel ev yolu eşleşmesi **0**.
+- KiCad kapalıyken ayrı koşu: `test_kicad_integration` + `test_sch_authoring_integration` **14/14 OK**;
+  skip eden 7 yazım testinin **6'sı OK** (blok şematik, PCB taşıma/iz/bölge/DRC, net sınıfı).
+  Net sınıfı testi bir koşuda başarısız, tekrarında geçti; kararsızlık ayrıca izlenmeli.
+- **Ölçülmedi:** G2-f (`test_sch_scene` R203 işaretçi → `set_value`). İki koşuda test ortasında
+  `explorer.exe` üzerinden KiCad açıldı ve yazım doğru biçimde `editor_open` ile reddedildi.
+  Atlama koşulu yalnız test başında, editör denetimi yazım anında ölçülür; bu bir kod hatası değil,
+  KiCad kapalı tutulan bir koşuda yeniden ölçülmelidir.
+
+## RD dalga 1 tamamlandı — D1-1…D1-7
+
+- Ortak bulgu şeması/kimliği, kimlikli sınırlar, `checks_run` ve `check`, CLI 0/1/2,
+  içeriksiz `audit.jsonl`, ayrı sayı/üyelik/ad/çokluk kalibrasyonu ve 13 yazıcıda bağımsız disk geri okuması tamamlandı.
+  Çekirdek **0.1.21**; VS Code kodu değişmedi. Her paket ayrı dal ve commit zincirinde; 13 Ekim'de main'e alındı.
+- Son `.venv` tam takım: **337 test, 334 geçti, 3 skip**, Python exit **0**;
+  unittest **1542,108 sn**, alt süreç **1548,688 sn**. Gerçek KiCad entegrasyonu **11/11**, skip yok.
+  Skip'ler Windows symlink yetkisi ve tam koşu kabuğunda yapılandırılmamış iki motor testi.
+  Bu iki motor testi `dev-env.ps1` yapılandırmasıyla ayrıca gerçek Freerouting/TraceMaker üzerinden
+  **2/2 OK**, **439,029 sn**, skip yok; gerçek preview/apply/checkpoint/restore dahil.
+- Son readback/Engine hedef koşusu **50/50 OK**, **104,319 sn**, skip yok. 13 yazıcıda semantik yazım enjeksiyonu,
+  doğru SHA/yanlış niyet, fazladan net üyesi, kayıp dosya ve farklı proje R1 regresyonları ölçüldü.
+  Uyuşmazlık `ok=false, changed=true, verified=readback_mismatch`; dosya kendiliğinden geri alınmaz.
+- Son güçlendirilmiş kalibrasyon **10/10 OK**, **115,085 sn**, gerçek beş demo, skip yok.
+  Bileşen/sayfa/net/PCB toplamları ve üye bölümlemesi eşit; pic_programmer'da **19** pin tekrar farkı,
+  pic_programmer/video'da ad seçimi farkları raporlanır ve bağımlı dedektörler engellenir.
+  Tek kaynak provenance ile single-file sayfa sayısı ölçülür; metadata yoksa bilinmez.
+  CLI iz toplamı vermediğinden segment/arc kaynağı `saved_geometry`; bunu CLI ölçümü diye sunmuyoruz.
+- R7: beş demo × iki gerçek TraceMaker koşusu; **10/10** sonuç önceki tabloyla eşit ve kaynak hashleri korunmuş.
+  ecc83 14→0, pic_programmer 86→14, stickhub 128→29 açık bağlantı; video/interf_u dört koşuda UUID kapısında ret.
+  Kıyas süreci exit **1** (bu retler nedeniyle); gerileme yok, temiz demo veya K5 kalite kabulü yok.
+- Ruff `.venv\Scripts\ruff.exe check .` ve lisans denetimi temiz; wheel derlemesi ve izole wheel regresyonları geçti.
+  [Bağımsız hedefli denetim özeti](rd-dalga1-denetim-ozeti.md): bulgular giderildi ve yeniden üretildi.
+  Son metadata için beş bağımsız probe ve güçlendirilmiş bağımsız 10-test koşusu geçti (106,442 sn, skip yok).
+  Uygulayan ölçümü tek başına bağımsız tam takım, canlı IPC, fiziksel kart veya üretim kabulü değildir.
+- RD-G2 **5/16 fixture** (#1, #1b, #9, #12, #13). #1b niyet sınırı RD-C2'ye kadar açık.
+  S11 yayın JSON'u yazılmadı; **RD-B1** ve geçmiş imza temizliği açık; main birleştirmesi 13 Ekim'de yapıldı.
+  Geliştirme günlükleri `.pcbai-state/rd-wave1/` altında: `final-full.txt`, `final-full-process.json`,
+  `readback.txt`, `calibration-real.txt`, `engines.txt`, `r7.json`, `r7-comparison.json`, `IKIZ-DEFTERI.md`.
+
+## D1-1 / RD-A1 — ortak bulgu şeması (dal `ip/rd-a1-bulgu`)
+
+- **Uygulama ve uygulayan doğrulaması tamamlandı; bağımsız hedefli Codex denetimi tamamlandı.**
+  `pcbai/verify/finding.schema.json` ve `findings.py` ERC/DRC/parite ve diğer
+  dalga 1 kaynaklarını ortak şemaya çevirir. KiCad `description`, `type`, `group`, item UUID/pos
+  ve diğer ham alanlar korunur; `exclusion`/`ignore` özgün severity'si `raw_severity` alanında kalır.
+  Ham KiCad raporu kanıt kaydında değişmez; `verified` değerlerinin anlamı korunur.
+- `finding_id`: kaynak, kural, grup ve sıralı item UUID'lerinden SHA-256 ilk 12 hex.
+  UUID'li item'ın konumu kimliğe girmez; UUID'siz konum 0,001 mm'ye decimal round-to-even ile yuvarlanır.
+  Yinelenen kimlikler deterministik `#n` alır; motor kıyası temel kimlik ve çokluğu kullanır.
+  Böylece 1→2 yinelenen bulgu geçişinde yalnız bir yeni hata bulunur; sıra eki değişimi ek hata sayılmaz.
+- ERC/DRC, şematik/PCB/motor önizlemeleri ve apply kapısı ortak normalleştirmeyi kullanır.
+  Motor önizlemesindeki gerçek DRC bulgularının kaynağı `drc`/`parity` olarak kalır.
+  Çekirdek 0.1.15; eklenti kodları/sürümleri değişmedi. Şema wheel paket verisine eklendi.
+- `tests/test_verify_findings.py` **15 yeni test**: şema, kimlik tekrarı, UUID'li hareket,
+  UUID'siz yuvarlama, kararlı yinelenen sıra eki/çokluk, ham alanlar ve kanıt raporu korunması,
+  kaynak/severity eşlemesi, yanlış rapor reddi, motor önizlemesi ve KiCad eklentisi render uyumluluğu.
+  İki farklı geçici dizindeki `ecc83-pp` DRC koşuları aynı kimlik listesini verdi; kaynak SHA haritası korundu.
+- Tam takım **274 test, OK (271 geçti, 3 skip)**; Python exit 0, 867,938 sn (unittest 864,110 sn).
+  Skip'ler önceki gibi Windows symlink yetkisi ve ortamda tanımlı olmayan iki gerçek motor testi.
+  Kapalı editör gerektiren gerçek PCB/şematik yazma testleri geçti.
+  Ayrı gerçek KiCad entegrasyonu **11/11**, skip yok, Python exit 0, 268,765 sn (unittest 268,471 sn).
+  Birleşik CLI/eklenti/motor/çekirdek/VS Code/fixture/yeni şema uyumluluğu **74/74**, exit 0, 50,516 sn.
+- Ruff ve lisans denetimi exit 0. Wheel oluşturuldu; `python -I` ile wheel içinden 0.1.15 sürümü ve
+  paketlenmiş JSON Schema yüklenerek normalleştirme doğrulandı; kullanıcı ortamına paket kurulmadı.
+- Önceki tam ve ayrı CLI koşuları `0xC000013A` ile özet oluşmadan kesildi (352,625 ve 167,922 sn).
+  Yerel çalıştırıcı `CREATE_NO_WINDOW` kullanarak alt süreci başlattıktan sonra yukarıdaki tamamlanmış sonuçlar alındı;
+  kesin kesinti nedeni belirlenmedi. Ürün/test kodu bu kesinti için değiştirilmedi, önceki günlükler korundu.
+  Geliştirme kanıtları `.pcbai-state/d1-1/` altında (`full-hidden.txt`, `full-hidden-process.json`,
+  `kicad-hidden.txt`, `kicad-hidden-process.json`, `compat.txt`, statik denetim ve wheel günlükleri).
+  Gerçek Freerouting/TraceMaker kalitesi, canlı IPC, fiziksel kart/üretim doğrulanmadı.
+  Yayın kanıtı oluşturulmadı; D1-2 başlamadı. Paket bağımsız denetim sonrası birleştirilir.
+
+## RD dalga 0 — 13 Ekim 2026 (dal `ip/rd-dalga0`)
+
+### D1-0 kapanış uygulaması — 13 Ekim 2026
+
+- **D1-0 kabul edildi.** Claude, `ef05261` commit'ini bağımsız denetledi: KiCad editörleri kapalıyken
+  proje `.venv` ortamında **259 test, OK (256 geçti, 3 skip), 693,0 sn**, Python exit 0.
+  Skip'ler Windows symlink yetkisi ve bu kabukta tanımlı olmayan iki motor (Freerouting, TraceMaker).
+  Yeni dört karakterizasyon testi, şematik yazım entegrasyonu, Ruff ve lisans denetimi geçti.
+  Uygulayanın `0xC000013A` kesintileri denetimde tekrarlanmadı; tam takım doğrulaması kapandı.
+  [Depoda erişilebilir özet](rd-dalga0-denetim-ozeti.md#d1-0-kabulü); ham rapor yerel
+  `.pcbai-state/audit-rd-dalga0/d1-0-review.md`. Canlı IPC/fiziksel kart/üretim kabulü değildir.
+  Engel olmayan not: fixture kaynak SHA kontrolü `finally` içinde olduğundan, ikinci bir hata asıl test hatasını
+  gölgeleyebilir; bu denetimde kod değiştirilmedi.
+
+- `S11.md` ölçülen projeyi `ecc83-pp` olarak belirtir; `ecc83-pp_v2` ölçülmedi.
+  AGENTS.md test/lint/CLI/doctor/MCP komutları proje `.venv` yorumlayıcısını kullanır.
+- `tests/test_fault_fixtures.py` dört karakterizasyon testi ekler: #1 düz DRC temiz ama parite J2.1
+  `net_conflict`; #9 DRC/parite temiz ama native ad→üye eşlemesi dış JSON ile ters;
+  #12 araç eksikse `ok=false/not_run/missing_dependency`; #1b DRC/parite temiz ama niyetteki ayrı netler birleşik.
+  Her fixture özel geçici kopyada ölçülür; kaynak dosyalarının SHA-256 haritası önce/sonra eşitliği doğrulanır.
+- RD-G2 **4/16 fixture** (#1, #1b, #9, #12; #1b, #1'in alt vakası).
+  #1b bilinen niyet kaçağıdır; geçen karakterizasyon testi ürünün kusuru yakaladığı anlamına gelmez.
+  Yeni ürün yakalayıcısı, canlı IPC/SPICE/fiziksel kart/üretim doğrulaması eklenmedi; çekirdek/eklenti sürümü değişmedi.
+- [Dalga 0 denetim özeti](rd-dalga0-denetim-ozeti.md) depoda erişilebilir; ham rapor ve geliştirme
+  günlükleri yerel `.pcbai-state/` altında kalır. S11 yayın JSON'u yazılmadı; **RD-B1 açık**.
+- Önceki uygulayan koşuları (bağımsız kabulden önce): dört fixture testi **4/4**, skip yok; süreç exit 0, 165,344 sn.
+  J2.1 pad UUID doğrulaması eklendikten sonra ilgili test ayrıca **1/1**, exit 0, 16,469 sn.
+  Ruff ve lisans denetimi exit 0; `doctor` KiCad CLI 10.0.4'ü buldu, canlı IPC bağlı değil,
+  Freerouting/TraceMaker bu kabuk ortamında bulunamadı. Kanıtlar `.pcbai-state/d1-0/` altında.
+  Ayrı gerçek KiCad entegrasyonu **11/11**, skip yok; alt süreç exit 0, 343,813 sn
+  (unittest süresi 340,518 sn). İlk tam koşu **259 test, 1 failure, 3 skip**, alt süreç exit 1,
+  967,141 sn: uygulayan koşu sırasında #1b README'sini güncellediği için kaynak SHA koruması
+  bu değişikliği yakaladı; fark yalnız README'de, KiCad/JSON fixture baytları eşit.
+  İlk günlük ve süreç sonucu korundu (`full.txt`, `full-process.json`); fixture değişiklikleri
+  bittikten sonra tam takım yeniden başlatıldı. Tekrar **259 test, 2 failure, 5 skip**, alt süreç exit 1,
+  689,359 sn (unittest 684,664 sn); yeni dört test geçti. Mevcut `NetclassEngineTests.test_power_class_change_with_real_drc_and_byte_equal_restore`
+  ve `SchematicMarkerFlowTests.test_marker_on_r203_drives_real_value_edit_to_done` açık KiCad nedeniyle
+  `editor_open` ile reddedildi; iki şematik yazım testi de bu nedenle skip oldu.
+  Diğer üç skip Windows symlink yetkisi ve iki motor ortamıdır. Günlükler `full-retry.txt`,
+  `full-retry-process.json`; o tam koşu yeşil değildi ve kapalı editörlerle yeniden doğrulama gerekiyordu.
+  Kullanıcı editörleri kapattıktan sonra üçüncü tam koşu `full-closed.txt`/`full-closed-process.json`:
+  yeni dört test geçti, fakat korpus testinde unittest özeti oluşmadan süreç
+  **3221225786 (0xC000013A)** ile sonlandı, 211,437 sn. Bu tamamlanmış veya başarılı test koşusu değildir.
+  Kapalı editörlerle dar `closed-writes` koşusunda önceki iki failure'ı veren test ayrı ayrı `ok` oldu;
+  ardından şematik yazım entegrasyonu sırasında aynı **3221225786** koduyla 101,078 sn'de sonlandı.
+  Dar koşunun da unittest özeti yok; 5/5 geçti sayılmaz. Sonlanmanın nedeni belirlenmedi;
+  uygulayan tamamlanmış tek tam takım yeşili elde edemedi. Yukarıdaki bağımsız denetim bu doğrulama açığını kapattı;
+  önceki koşuların günlükleri korunur, tamamlanmamış koşular başarılı sayılmaz.
+
+### Önceki dalga 0 ölçümü ve bağımsız denetimi
+
+- **Uygulayan ölçümü ve bağımsız Claude denetimi tamamlandı; RD-B1 yayın kanıtı açık.** Çekirdek/VS Code değiştirilmedi.
+  [S11](spikes/S11.md), [geliştirme sonucu](../.pcbai-state/s11/result.json).
+  kicad-happy MIT commit `06840467ad0f5d76af45f64449b1f5ecb10f052f`, KiCad 10.0.4/Python 3.11.5;
+  klon dışında `-I`, shell=False, 120 sn timeout ile özel demo kopyaları. Upstream kodu pakete alınmadı.
+- Beş R7 demosu × şematik/PCB × iki tekrar: **20/20 exit 0**, **10/10** finding_id kümesi,
+  liste ve ham çıktı SHA eşit. Süre **0,223–16,852 sn**, Windows analiz süreci peak working set
+  **40,60–194,50 MiB**. Bütün demo klasörlerinin önce/sonra/son SHA-256 haritaları eşit.
+- **385 şematik bileşeni, 13 sayfa örneği, 932 net**: sayılar ve referans kümeleri native netlistle eşit.
+  Beş demoda net üye kümeleri eşit; pic_programmer **19 ağda pinleri yineliyor**, çokluk korunan
+  listeler birebir değil (U2.7/U2.14 ×4, U5 pinleri ×2). Adsız/UUID kapsamlı net adları native
+  adlarla birebir değil; üye eşitliği ad eşitliği diye sunulmaz. RD-A4 bu kıyası tamamladı;
+  ad seçimi farkları yukarıdaki dalga 1 sonucunda ayrıca raporlanır.
+- PCB **386 footprint, 3055 pad**; düz iz/yay/via/zone/net toplamları, ön/arka toplamları ve CLI
+  boyutları eşit. SMD sınıfı video **144/143**, interf_u **1/0**: `BUS1` connect pad'lı kenar
+  konnektörü, CLI'de belirtilmemiş. İlk oracle via'yı iz saydı; düzeltildi, ilk ve son loglar ayrı.
+- Tek tekrar **474 bulgu**: şematik 225, PCB 249; **439 deterministic/35 heuristic/0 datasheet-backed**.
+  Tohum 11013 ile rastgele 20 dosya incelemesi: **14 doğru/2 yanlış/4 belirsiz**. İki alias bulgusu
+  aynı port metninin sayfa UUID kapsamını farklı ad sanıyor. Belirsizler: üretici fiyatı, RC aktarım
+  işlevi, yuvarlak avlu yerine kutu alanı, gerilim payından tasarım amacı çıkarımı. Etiketler uygulayana ait.
+- RD-G2 **3/16 fixture**; yeni yakalayıcı kod yok. [#1](../tests/fixtures/faults/01-drc-zero-short/README.md):
+  bakırda iki şematik net birleşirken gerçek normal DRC **0 hata/0 uyarı**; mevcut parite **1 net_conflict**.
+  [#9](../tests/fixtures/faults/09-wrong-net-members/README.md): doğru kart normal/pariteli DRC temiz,
+  dış JSON iki netin üyelerini ters bildirir; mevcut kalibrasyon aracı yok, yanlış JSON denetlenmiş sayılmaz.
+  [#12](../tests/fixtures/faults/12-missing-required-tool/README.md): boş geçerli şematikte mevcut araç ERC temiz;
+  gerekli araç yokken **ok=false/verified=not_run/missing_dependency**, ölçüm boş. Toplam checks_incomplete/CLI exit 2 açık.
+  [Fixture kanıtı](../.pcbai-state/s11/faults/result.json).
+- Uygulayan tam takım **255 test: 254 geçti, 1 Windows symlink yetkisi skip**, **1134,383 sn**;
+  [günlük](../.pcbai-state/s11/unittest-full.txt). Ayrı gerçek KiCad CLI **11/11**, skip yok,
+  **276,517 sn**; [günlük](../.pcbai-state/s11/unittest-kicad.txt). PowerShell stderr redirection'ı
+  unittest çıktısını NativeCommandError olarak sardı ve kabuk exit 1 döndü; iki günlükte de unittest
+  `OK` var. Kabuk exit'i test başarısızlığı veya Python exit 0 kanıtı olarak sunulmaz.
+  Ruff 0.17.0 doğrudan binary denetimi `All checks passed!`, `python -m ruff check .` exit 0,
+  lisans denetimi exit 0; [süreç sonuçları](../.pcbai-state/s11/static-checks.json).
+- Sınırlar: salt dosya/default analiz ölçümü; lifecycle/datasheet, EMC/termal/SPICE/cross/fab dedektörleri,
+  fiziksel kart/üretim ve bütün KiCad 10 özellikleri ölçülmedi. Uygulayan ölçümü tek başına bağımsız denetim değildir;
+  bu ölçüm ürün kabulü değildir.
+  Bağımsız [Claude denetim özeti](rd-dalga0-denetim-ozeti.md): 255 test OK, 3 skip
+  (Windows symlink yetkisi ve 2 motor ortamı); gerçek KiCad 11/11, Ruff temiz. Ölçüm iddialarını çürüten bulgu yok;
+  denetimde yayın JSON'u ve ecc83 proje adı eksik bulundu. Bunlar önceki uygulayan sonuçlarından ayrı denetçi ölçümleridir.
+  K15, K16 adım 1, K20 ve K21 kabul: [karar 0004](decisions/0004-referans-depolar.md).
+  K16 adım 2 (vendor), K17, K18 ve K19 açık. [Dalga 1 tarifindeki](plan-rd-dalga1.md) D1-1…D1-7 uygulanmadı;
+  D1-0 uygulama durumu yukarıdadır. Yayın sonucu yazılmadı, push yok.
+
+## Gerçek WSL/TraceMaker — 13 Ekim 2026 (dal `ip/tracemaker-wsl`)
+
+- Kullanıcının yeniden başlatması sonrası WSL2 çalıştı. SHA-256 doğrulanmış Ubuntu 26.04.1
+  ayrı PcbAi-Ubuntu dağıtımına kuruldu; GCC 15.2.0/CMake 4.2.3/Ninja CPU build **99/99**.
+  CUDA, Python binding ve upstream test paketi kapalı; PCBench kullanılmadı.
+  [S10 kurulumu ve ikili kimlikleri](spikes/S10.md),
+  [build](../.pcbai-state/wsl-build.json), [doctor](../.pcbai-state/tracemaker-postboot-doctor.txt).
+- Gerçek 0.9.0 CLI kısmi rota için **3**, ölümcül hata için **1** döndürüyor. Önceki 0/1
+  izin listesi düzeltildi: route 0/3, place yalnız 0. Kısmi rota `route_complete_reported=false`;
+  tamamlama/DRC/kalite kabulü verilmez. Kaynak, korunan baytlar, refill ve yeni hata kimliği
+  kontrolleri adaydan önce/uygulamada korunur.
+- Uygulayan son ilgili inventory/route/evidence/engine/servis/MCP **60/60**, **12,933 sn**;
+  [koşu](../.pcbai-state/tracemaker-final-focused.txt). Bağımsız son protocol/route **25/25**,
+  **3,315 sn**. Windows cp1254 konsol hatası benchmark'ı kesiyordu; backslashreplace düzeltmesi
+  gerçek koşu ve bağımsız temsil edilemeyen Unicode fixture'ında ölçüldü. İlk kısmi/önceki
+  protokol kıyasları korunur; son ölçüm ayrı dosyadır.
+  [Bağımsız son rapor](../.pcbai-state/audit-all-plan/tracemaker-wsl-review.md).
+- Bağımsız gerçek Linux process-group ölçümü: TERM'i yok sayan owned parent+child için
+  GNU timeout 1 sn + kill-after 5 → **137**, iki PID de yok; erken Windows timeout sonrası
+  Linux sınırında da iki PID yok, geç çıktı yazımı yok.
+  [Süreç ölçümü](../.pcbai-state/audit-all-plan/wsl-timeout-results.json).
+- Bağımsız gerçek tiny route iki tekrarda raw-byte/route UUID/geometri eşit; **1→0**,
+  blockers boş, gerçek frozen apply/checkpoint ve bayt eşit restore. Gerçek kilit kapısı reddetti.
+  Tiny place ve ecc83 eco çalıştı ama **moved=0/no-op**; anlamlı yerleşim kalite kabulü değildir.
+- Uygulayan gerçek yapılandırılmış motor entegrasyonu **2/2**, skip yok, **329,263 sn**;
+  [koşu](../.pcbai-state/tracemaker-runtime-native.txt). TraceMaker ve Freerouting gerçek
+  küçük fixture preview/render/apply/checkpoint/restore ile ecc83 yeni-hata ret kapısı geçti.
+- Beş KiCad demosu × iki koşu; bütün kaynaklar korundu. [Son kıyas](../.pcbai-state/tracemaker-exit-bench.md),
+  [JSON](../.pcbai-state/tracemaker-exit-bench.json). Ecc83 **14→0**, DRC **42→30** ama iki yeni
+  zone clearance → uygulama bloke. Pic **86→14**, DRC **86→14**, 1 via; stickhub **128→29**,
+  DRC **128→29**, 19 via. Son iki adayda yeni hata yok; tamamlanmış/temiz kart kabulü yok.
+  Video/interf_u duplicate/missing UUID kapısında reddedildi. Ölçülen üç demo çiftinde raw
+  motor çıktı SHA-256 aynı; tüm kaynak-kart koruma kontrolleri doğru. Kıyas komutunun genel
+  exit 1'i reddedilen kartlar nedeniyle beklenendir; beş temiz demo geçti diye sunulmaz.
+- Editable/core/wheel **0.1.14**, 70 dosya, core-only/schema import ve ikili/plugin ayrımı geçti.
+  [Paket](../.pcbai-state/tracemaker-runtime-wheel-check.json), SHA-256
+  `45004376b7ec904237e4e148d358f1d4547878dfbbbe49ac3abdd5decae3a171`.
+  Ruff/lisans temiz. Önceki tam 252 takım bu son exit-protokol regresyonunu kapsamıyor;
+  bu fark son ilgili ve gerçek motor koşularıyla ölçüldü.
+- Gerçek iki-pad hareket denemesinde yalnız üst düzey konumun sıfır açı gösterimi farklıydı:
+  `(at x y)` ↔ `(at x y 0)`. Yerleşim bekçisi bu iki izinli gösterimi karşılaştırırken eşit sayar;
+  kilit, pad/net, değer, iç koordinat ve diğer baytlar korunur, rota bekçisi değişmez.
+  Regresyon/olumsuz testler son 60 takımında. Üst üste padli scratch fixture guard'ı geçse de
+  **0→2 unconnected** ile apply reddedildi; kaynak korunur. Bu ayrı elektriksel kapı gevşetilmedi.
+- Ayrık başlangıçlı owned iki-pad routable fixture gerçek **moved=2**, **2→2 unconnected**,
+  blockers boş; frozen bayt eşit apply/checkpoint/bayt eşit restore bağımsız ölçüldü.
+  [Hareket deneyi](../.pcbai-state/audit-all-plan/tracemaker-moving-place-separated.json).
+  Bu işlem kabulü beş demodaki yerleşim kalitesi, blok kısıt aktarımı veya fiziksel kabul değildir.
+- Kurulu 0.1.14 özel HTTP→MCP stdio status/gerçek WSL motor keşfi **2/2**;
+  [ölçüm](../.pcbai-state/tracemaker-mcp-smoke.json). Versiyon/protokol/PCM son **17/17**,
+  **2,418 sn**; [kayıt](../.pcbai-state/tracemaker-final-package-contract.txt).
+- Ortam değişkenleri kullanıcı düzeyinde kaydedildi; dev-env açık process override'ını korur.
+  Eski servis/terminal yeniden başlatılmalı veya dev-env dot-source edilmeli. Envanterdeki
+  `tested=false`/commit `null`, ayrı manuel build/runtime kanıtıyla otomatik doldurulmaz.
+
+## Pasif tarif SPICE testi — 13 Ekim 2026 (dal `ip/pasif-spice`)
+
+- `spice_block_test`: üç pasif tarifin altı varyantı, tarifin literal pin gruplarından
+  oluşturulan ideal R/C netlistiyle gerçek ngspice'ta ölçüldü. Bölücü DC gerilim/akım,
+  RC low/high-pass kesim genlik/faz, debounce pullup/pulldown transient karşılaştırması.
+  Yüzde 1 ve açık mutlak taban toleransları; eksik/NaN/uyumsuz vektörler hata,
+  geçerli ama yanlış ölçüm `passed=false`/`simulation_mismatch` döner.
+- Kapalı parametreler, SI/range ve sayı-türü kontrolü; kullanıcı metni SPICE satırı olmaz.
+  Özel geçici klasör, ayrı worker, 60 sn timeout. Özgün girdiler, tarif/testbench sürümü,
+  netlist SHA ve `source=simulated` ölçümler kanıta bağlıdır; kullanıcı projesine yazım yok.
+- Son ilgili takım **52/52**, skip yok, **5,226 sn**;
+  [koşu](../.pcbai-state/passive-spice-final-focused.txt). Bağımsız **48/48**, **4,651 sn**;
+  eksik/NaN/AC/time typing ve gerçek kısa-devre mutation olumsuz ölçümleri;
+  [rapor](../.pcbai-state/audit-all-plan/passive-spice-review.md).
+  AC scale'de bool imaginary kabulü P2 düzeltildi ve regresyon eklendi. İlk başarısız
+  float-literal/AC-scale koşusu korunur; son ölçümler yeşildir.
+- Tam takım **252 test: 251 geçti, 1 Windows symlink yetkisi skip**, **1180,332 sn**;
+  [koşu](../.pcbai-state/passive-spice-full.txt). Bu koşu başlarken altı yeni test vardı;
+  son bool-scale regresyonu ve cevap sözleşmesi ayrıca son 52 takımında ve kurulu sürümün
+  plugin/servis/SPICE **25/25**, **19,723 sn** koşusunda doğrulandı.
+- Gerçek global Engine altı varyant **6/6**; özel HTTP→MCP stdio keşif/simülasyon/ret
+  **3/3**. [Ölçümler](../.pcbai-state/passive-spice-measure.json),
+  [MCP](../.pcbai-state/passive-spice-mcp.json).
+- Ayrı gerçek KiCad CLI **11/11**, skip yok, **270,643 sn**;
+  [koşu](../.pcbai-state/passive-spice-cli.txt). Kullanıcı ayarlarına/kartlarına yazılmadı;
+  gerçek apply/restore, netlist, render ve fab ölçümleri özel fixture'larda geçti.
+- Örneklerde en büyük göreli fark: bölücüler **%0**, RC **%1,6e-14**,
+  debounce pullup **%0,000177**, pulldown **%0,0000312**. Bunlar belirtilen ideal
+  girdilerin ölçümüdür; tüm değer aralığı veya gerçek komponent toleransı kabulü değildir.
+- Editable **0.1.13**, wheel 70 dosya: schema/core-only/yeni araç import; ikili/plugin yok.
+  [Paket denetimi](../.pcbai-state/passive-spice-wheel-check.json), SHA-256
+  `ee26be460a4b9040a716cf3aceea85a37c5674b51aec4b64bc2183c537a97034`.
+- Tarifler **olgunluk 0**. İdeal topology testi gerçek şematik/parça modeli/ERC/stock/
+  fiziksel kabul sağlamaz; çok küçük/sıfır uyarımda mutlak tolerans baskındır.
+  Windows yeniden başlatma kullanıcı tarafından sonraya bırakıldı; Linux motor kabulleri açık.
+
+## TraceMaker sürüm arayüzü — 13 Ekim 2026 (dal `ip/tracemaker-surum`)
+
+- Pinned 0.9.0 kaynak CLI'si `version` alt komutunu kullanıyor; `--version` sorgusu yanlıştı.
+  Envanter sorgusu düzeltildi, lowercase `tracemaker 0.9.0` semver ayrıştırması eklendi.
+  Nonzero sorgu `available=false` kalır; `tested=false`, bilinmeyen commit `null` korunur.
+- Uygulayan ilgili route/engine/MCP/servis takımında **57/57**, skip yok, **145,153 sn**;
+  [koşu](../.pcbai-state/tracemaker-version-tests.txt). Bağımsız **55/55**, **16,081 sn**,
+  strict gerçek fake-child protokolü ve nonzero-query ölçümü; [rapor](../.pcbai-state/audit-all-plan/tracemaker-version-review.md).
+  Ruff/lisans temiz. Önceki 243 tam takım yeni üç envanter testini kapsamadı.
+- Editable ve bağımsız wheel import **0.1.12**; 69 dosya, şema mevcut, dış ikili/plugin yok.
+  [Paket ölçümü](../.pcbai-state/tracemaker-version-wheel-check.json), SHA-256
+  `7d6fdecd89ffc8b1504a0e54882d284f1ffabd21eebeb6789596327e3b1a5c34`.
+- Bu kaynak/arayüz denetimi gerçek Linux motorunu çalıştırma değildir. WSL yeniden başlatma,
+  derleme, beş demo kıyası, determinizm/timeout ve K5 açık kalır.
 
 ## State/proje ayrımı — 13 Ekim 2026 (dal `ip/state-yapilandirma`)
 
@@ -504,3 +848,54 @@ G2 ve G3 şematik tamamlandı (yukarıda). Görünüm izinde sıradaki G5 için 
 yenileme optimizasyonu; KiCad paketi K-1–K-4 ayrı iş. Ana planın canlı izinde S1 ikinci kanal ve S3
 disk/tampon/revert ölçümleri, dolu seçim; ardından P2 ve doğrulanmış sembol/pin/footprint dizini. Bu altyapı
 üzerine IR ve SPICE testli bloklar. Üretim kabulü gerçek kart ölçümü olmadan verilmeyecek.
+
+## D1-2 — 13 Ekim 2026
+
+Kimlikli limit kaydı ve docs/limits.md eklendi. 2 limit testi OK, Ruff exit 0; dosya/belge kanıt bağlantıları doğrulandı.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## D1-3 — 13 Ekim 2026
+
+check aracı ve checks_run manifesti eklendi; eksik/çöken kontrol incomplete, excluded bulgu findings olur. 27 hedefli test OK, Ruff exit 0; gerçek fixture #1 pariteyi yakaladı.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## D1-4 — 13 Ekim 2026
+
+pcbai check komutu eklendi; gerçek alt süreçlerde 0/1/2 çıkışları ve JSON doğrulandı. 5 CLI testi OK; Ruff exit 0.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## D1-5 — 13 Ekim 2026
+
+Engine.call üzerinde içeriksiz audit.jsonl eklendi: süreç/iş parçacığı kilidi, 10 MB tek yedek, yazma hatasında uyarı. 17 audit/job/manifest testi OK, Ruff exit 0; argüman metni loglanmaz.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## D1-6/RD-A4 — 13 Ekim 2026
+
+Kalibrasyon: 10 test gerçek beş demo ile geçti (40,209 sn, skip yok). Net bölümlemesi beşinde eşit; pic_programmer 19 çokluk farkı ve iki demoda ad seçimi farkları bağımlı dedektörleri engeller. UUID kapsamı yalnız açık native sayfa eşlemesiyle normalleştirilir. CLI iz sayısı sunmadığından segment/arc toplamı kaydedilmiş geometriyle ölçülür. A2 hata manifestinde istenen parite ve giriş hashleri bağımsız denetim bulgusuna göre düzeltildi.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## D1-7/RD-A3 — 13 Ekim 2026
+
+13 yazma aracında disk SHA ve bağımsız niyet geri okuması, checkpoint geri yükleme önerisi ve MCP changed=true hata sözleşmesi eklendi. 50 readback/Engine testi OK, gerçek connect/add_block netlisti dahil; 13 semantik yazım enjeksiyonu ve SHA doğru yanlış aday testleri geçti. Fixture #13 eklendi (5/16). Bağımsız denetim iki hata yolunu buldu; proje kapsamı ve yazım sonrası kayıp belge yanıtları düzeltildi. Ruff .venv executable exit 0.
+
+Bağımsız hedefli Codex denetimi tamamlandı. Son dalga doğrulaması ayrıca kaydedilir; hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Geliştirme kanıtları `.pcbai-state/rd-wave1/` altında; yayın JSON'u yazılmadı.
+
+## Dalga 1 denetim düzeltmeleri — 13 Ekim 2026
+
+CLI JSON çıktısı cp1252 strict dahil ASCII güvenli Unicode kaçışlarıyla yazılır; parse edilen değerler kayıpsızdır ve 0/1/2 çıkışları korunur. Denetim kaydı thread-local/nested çağrı bağlamında aracın mevcut doğrulanmış hedefini kullanır; fazladan proje hash taraması kaldırıldı, güvenlik kontrolleri korunur. Son üretilen PCM arşivi metadata 0.1.14 olarak doğrulandı. Hedefli son test ölçümü aşağıda kaydedilir; önceki 337-test tam koşu 0.1.21 içindir.
+
+Son düzeltme koşusu **76 test OK**, **100,030 sn**, Python exit **0**, skip yok
+(`post-review-final-tests.txt`). CLI, audit, Engine, jobs, manifest ve 13 yazıcının readback testleri dahil.
+Bağımsız denetçi aynı ürün koduyla CLI/cp1252 testlerini geçti; düzeltilmiş audit beklentisiyle
+**6 test OK**, **0,365 sn**, skip yok. İç içe çağrı hedefi ve ek tarama yokluğu ayrıca ölçüldü.
+Ruff ve lisans denetimi temiz. İlk ölçümlerde testin sabit hash sayısı beklentisi yanlıştı;
+aracın kendi zorunlu taramalarıyla audit sarmalayıcısı kıyaslanacak şekilde düzeltildi.
+0.1.22 için tam takım yeniden koşulmadı; 337-test genel ölçümü 0.1.21'e aittir.
+Hedefli testler canlı IPC/fiziksel kart/üretim kabulü değildir. Yayın JSON'u yazılmadı.
+Çalışan eski servis bu kodu kendiliğinden yüklemez; takım bitince `python -m pcbai stop` ile durdurulabilir,
+ilk istemci isteğinde yeniden açılır. Bekleyen önizlemeler yeniden oluşturulmalıdır.

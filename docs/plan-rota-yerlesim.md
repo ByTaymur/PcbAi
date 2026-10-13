@@ -242,16 +242,20 @@ ama Faz 5'in süresini kısaltması beklenir. R1 ortam gerektirmediği için hem
 ## 10. Kararlar ve ortam
 
 Kullanıcı WSL + TraceMaker + Freerouting ile ilerlemeyi onayladı ve PCBench'i istemedi.
-WSL için Windows yeniden başlatması gerekiyor; bilgisayar otomatik yeniden başlatılmadı.
+13 Ekim kullanıcı yeniden başlattı; WSL2/PcbAi-Ubuntu ve pinned CPU motor derlemesi tamamlandı.
 [S10 ortam kaydı](spikes/S10.md). K12 sınırı ve Java/JAR yedeği [0003](decisions/0003-engines.md)'tedir.
 
 ## 11. 12 Ekim uygulama durumu
 
+13 Ekim farkı: R3 envanter sorgusunda TraceMaker 0.9.0'ın gerçek `version` alt komutu ve
+lowercase semver arayüzü düzeltildi. Uygulayan 57/57, bağımsız 55/55 ilgili test;
+[S10](spikes/S10.md). Yeniden başlatma/CPU derlemesi tamamlandı; R2/S10 kalite kabulü açık.
+
 | Paket | Yazılım / ölçüm durumu | Açık kabul |
 |---|---|---|
-| R0 | WSL kararı onaylı; Windows bileşenleri kuruldu; PCBench indirilmedi | Yeniden başlatma, Ubuntu'nun listelenmesi |
+| R0 | WSL2/PcbAi-Ubuntu 26.04.1 çalışıyor; pinned CPU 0.9.0 ELF derlendi; PCBench indirilmedi | Ortam kapısı ölçüldü; motor kalite kabulü ayrı |
 | R1 | Gerçek native hata + JAR DSN/SES denemesi; [S4](spikes/S4.md) | Demo kalite kapıları geçmedi; yayın sonucu yok |
-| R2 | `strip_tracks.py`, WSL argv/timeout, [S10](spikes/S10.md) | TraceMaker derlemesi ve tüm canlı S10 ölçümleri |
+| R2 | `strip_tracks.py`, gerçek CPU derleme/sürüm, WSL argv/timeout, [S10](spikes/S10.md) | Temiz demo kalite ve yerleşim kabulleri |
 | R3 | `engines/`, `external.find_*`, doctor (env/PATH, native/WSL, JAR) | TraceMaker sürüm/commit ve Linux süreç ölçümü |
 | R4 | Korunan düğüm baytları, UUID/net/katman, kilit, geçerli kontur, yeni DRC kimlikleri | Gerçek TraceMaker çıktıları |
 | R5 | `autoroute`, `route_engines`, preview işleri, immutable aday, checkpoint/restore, önce/sonra SVG | Beş demoda temiz motor kabulü |
@@ -259,6 +263,13 @@ WSL için Windows yeniden başlatması gerekiyor; bilgisayar otomatik yeniden ba
 | R7 | `bench_engines.py`, yerel JSON/MD, [baseline](baseline-motorlar.md), [0003](decisions/0003-engines.md) | K5 seçimi; TraceMaker + yerleşim kıyası |
 | R8 | VS Code komutları ve önce/sonra aday paneli, Chromium UI testi; 0.1.16 yüklendi | Gerçek Extension Host'ta motor komutu ve kullanıcının elle kabulü |
 | R9 | PLAN/status/eksikler/tools/README/karar/deneme kayıtları güncellendi | Her paketin ölçümüyle faz kabulleri ayrıca kapanır |
+
+13 Ekim gerçek motor farkı: CPU 0.9.0 ve WSL process-group timeout ölçüldü;
+route exit 3 kısmi kart protokolü düzeltildi. Gerçek tiny preview/apply/render/checkpoint/restore
+geçti; beş demo × iki koşu [S10](spikes/S10.md)'da. Ecc83 14→0 fakat yeni clearance,
+pic 86→14, stickhub 128→29; video/interf_u UUID kapısında reddedildi. Üç ölçülen çiftte
+raw motor çıktısı eşit. Demo yerleşimi no-op; ayrı iki-pad fixture gerçek iki hareket,
+frozen apply/checkpoint/restore geçti. K5/temiz beş demo ve yerleşim kalite kabulü açık.
 
 Freerouting'in native 2.5.0 ikilisi ölçülen GraalVM hatası nedeniyle kullanılabilir kabul edilmedi; açık
 Java 25/JAR yapılandırması desteklenir. `tested=true` ve varsayılan motor seçimi uydurulmaz.

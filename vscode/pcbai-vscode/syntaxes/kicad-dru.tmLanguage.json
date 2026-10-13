@@ -1,0 +1,21 @@
+{
+  "name": "KiCad Design Rules", "scopeName": "source.kicad-dru",
+  "patterns": [
+    {"name": "comment.line.number-sign.kicad-dru", "match": "#.*$"},
+    {"name": "string.quoted.double.condition.kicad-dru", "begin": "(?<=condition)\\s*(\")", "end": "\"", "patterns": [
+      {"name": "constant.character.escape.kicad-dru", "match": "\\\\."},
+      {"name": "variable.other.property.kicad-dru", "match": "\\b[AB]\\.[A-Za-z_][A-Za-z0-9_]*"},
+      {"name": "keyword.operator.logical.kicad-dru", "match": "&&|\\|\\||==|!=|<=|>=|[!<>]"},
+      {"name": "string.quoted.single.kicad-dru", "begin": "'", "end": "'", "patterns": [{"name": "constant.character.escape.kicad-dru", "match": "\\\\."}]},
+      {"name": "constant.numeric.kicad-dru", "match": "(?<![\\w.])-?[0-9]+(?:\\.[0-9]+)?(?:mm|mil|in|deg)?\\b"}
+    ]},
+    {"name": "string.quoted.double.kicad-dru", "begin": "\"", "end": "\"", "patterns": [{"name": "constant.character.escape.kicad-dru", "match": "\\\\."}]},
+    {"name": "keyword.control.kicad-dru", "match": "(?<=\\()\\s*(?:version|rule|condition|constraint|layer|severity)\\b"},
+    {"name": "storage.type.constraint.kicad-dru", "match": "\\b(?:clearance|hole_clearance|hole_to_hole|track_width|via_diameter|hole_size|length|skew|disallow|assertion|annular_width|edge_clearance|physical_clearance|physical_hole_clearance|diff_pair_gap|diff_pair_uncoupled)\\b"},
+    {"name": "keyword.other.bound.kicad-dru", "match": "(?<=\\()\\s*(?:min|max|opt)\\b"},
+    {"name": "constant.language.kicad-dru", "match": "\\b(?:error|warning|ignore|track|via|micro_via|blind_via|pad|zone|text|graphic|hole|footprint)\\b"},
+    {"name": "constant.numeric.kicad-dru", "match": "(?<![\\w.])-?[0-9]+(?:\\.[0-9]+)?(?:mm|mil|in|deg)?\\b"},
+    {"name": "punctuation.section.parens.kicad-dru", "match": "[()]"}
+  ]
+}
+

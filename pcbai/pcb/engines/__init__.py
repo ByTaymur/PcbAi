@@ -17,7 +17,7 @@ def describe():
         try:
             path = finder()
             wsl = path.startswith("wsl:")
-            flag = "--help" if name == "freerouting" else "--version"
+            flag = "--help" if name == "freerouting" else "version"
             with tempfile.TemporaryDirectory(prefix="pcbai-engine-info-") as tmp:
                 command = wsl_argv(path, [flag], 10, home=tmp) if wsl else [path, flag]
                 if name == "freerouting":
@@ -27,7 +27,7 @@ def describe():
             if process.returncode:
                 raise PcbAiError("engine_unavailable", (process.stderr or process.stdout)[-500:])
             output = (process.stdout or process.stderr).strip()
-            version_match = re.search(r"(?:Freerouting (?:CLI )?v|[Vv]ersion\s+|TraceMaker\s+v?)(\d+\.\d+\.\d+)", output)
+            version_match = re.search(r"(?:Freerouting (?:CLI )?v|version\s+|tracemaker\s+v?)(\d+\.\d+\.\d+)", output, re.IGNORECASE)
             info = dict(engine=name, available=True, path=path, via="wsl" if wsl else "native",
                         version=version_match.group(1) if version_match else output[:200], commit=None,
                         deterministic_supported=name == "tracemaker", tested=False, cpu_only=name == "tracemaker")
@@ -69,8 +69,12 @@ def execute(state, data, engine, operation, options, timeout=150, *, project_dat
                        XDG_CACHE_HOME=str(home / "cache"))
             outcome = run_process(command, cwd=root, timeout=timeout, env=env)
             outcome["deterministic"] = deterministic
-            if outcome["returncode"] not in {0, 1}:
+            # Pinned TraceMaker reports a written, partially routed board with exit 3.
+            # Exit 1 is a fatal CLI exception, not a candidate. Placement only accepts 0.
+            accepted = {0, 3} if operation == "route" else {0}
+            if outcome["returncode"] not in accepted:
                 raise PcbAiError("engine_failed", "TraceMaker failed: " + outcome["stderr_tail"])
+            outcome["route_complete_reported"] = outcome["returncode"] == 0 if operation == "route" else None
         else:
             from pcbai.pcb.engines.freerouting import route
             outcome = route(source, destination, options, timeout)

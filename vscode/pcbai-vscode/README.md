@@ -53,3 +53,24 @@ Raporlar varsayılan olarak `.pcbai-state/` altına gider; yayımlanmış kanıt
 betiklerinde `--publish`, tarayıcı betiğinde `PCBAI_PUBLISH_EVIDENCE=1` açıkça seçilir. Junction/hardlink
 üzerinden kanıt yazımı reddedilir. Eklenti LGPL-2.1-or-later; vendor MIT lisansları pakette korunur.
 
+# Kural editörü (EK-1)
+
+IR yardımı (EK-2): `*.pcbai-ir.json` ve `*.pcbai.json` dosyalarında
+`parts[].symbol`, footprint ve `connections[][]` literal pin değerleri için
+tamamlama/hover vardır. Servis açık ve dosya kayıtlı proje kökünde olmalıdır;
+yardım kendiliğinden servis başlatmaz. `PcbAi: Yerel parça ara` komutu yerel
+sembol/footprint/pin-pad bilgisini salt okunur bir JSON sekmesinde açar.
+Footprint önerileri sembolün gerçek Footprint alanıyla sınırlıdır. Stok,
+datasheet ve üretim kabulü verilmez. Kısmi JSON yardımcı öneriler alabilir;
+bu geçerli veya kaydedilmiş tasarım iddiası değildir. Geniş kütüphane
+korpusunda 150 ms performans hedefi henüz karşılanmadı.
+
+Worktree'den paketlerken `build_vsix.py --service-root <.venv içeren depo>`
+ile servis kökü seçilebilir; `pcbai.root` / `pcbai.python` ayarları bunu değiştirebilir.
+
+`.kicad_dru` dosyalarında renklendirme, parantez/yorum/folding ve
+`pcbai-clearance`, `pcbai-track-width`, `pcbai-via`, `pcbai-keepout`,
+`pcbai-length-match` şablonları vardır. Dosyanın başına `(version 1)` ekleyin.
+Şablonlar düzenlenebilir örnektir; KiCad kural sözdizimi kontrolü ve üretici
+koşulları ayrıca doğrulanmalıdır. Renklendirme bir doğrulayıcı değildir.
+

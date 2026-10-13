@@ -8,6 +8,7 @@ const ACTIONS = [
   ['pcbai.view', 'Kart 2B'], ['pcbai.schematic', 'Şematik'], ['pcbai.view3d', '3B'],
   ['pcbai.check', 'ERC + DRC'], ['pcbai.pdf', 'Şematik PDF'], ['pcbai.stats', 'Kart ölçüleri'],
   ['pcbai.autoroute', 'Otomatik rota (önizle)'], ['pcbai.autoplace', 'Otomatik yerleşim (önizle)'],
+  ['pcbai.searchParts', 'Yerel parça ara'],
   ['pcbai.addMcp', 'Ajan için MCP ekle'], ['pcbai.status', 'Servis durumu'], ['pcbai.stop', 'Servisi durdur'],
 ];
 

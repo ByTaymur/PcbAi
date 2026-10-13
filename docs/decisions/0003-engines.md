@@ -22,6 +22,12 @@ K14 yalnız KiCad demoları; K5 **açık**.
 K5, TraceMaker S10 ölçümü ve aynı bütçeli demo kıyası olmadan kapatılamaz. Kendi tavlama motorunun
 iptali de henüz kararlaştırılmadı.
 
+13 Ekim ilerleme: kullanıcı yeniden başlattı; WSL2/PcbAi-Ubuntu 26.04.1 kuruldu,
+CPU-only 0.9.0 pinned kaynak derlendi. K13 ortam kapısı ölçüldü. Gerçek süreç timeout,
+küçük fixture apply/restore ve beş demo × iki rota koşusu [S10](../spikes/S10.md)'da.
+Yeni DRC/eksik bağlantı/UUID retleri nedeniyle K5 ve anlamlı placement kalite kabulü açık;
+varsayılan motor veya kendi tavlamamızı iptal kararı verilmedi. K12 paket ayrımı korunur.
+
 Yerel kayıtlar: [native hata](../../.pcbai-state/s4-debug.json),
 [WSL kurulumu](../../.pcbai-state/wsl-elevated.txt), [motor kıyası](../../.pcbai-state/s4-current.json).
 Resmi CLI bayrakları: [Freerouting 2.5.0 CLI belgesi](https://github.com/freerouting/freerouting/blob/v2.5.0/docs/command_line_arguments.md).

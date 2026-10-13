@@ -26,6 +26,8 @@ async function main() {
   const document = 'board"><script>BAD</script>.kicad_pcb';
   const session = { id: 's-test', project: 'Test.kicad_pro', root, revision: 'a'.repeat(64), documents: [document] };
   const submitted = [];
+  const partCalls = [];
+  const opened = [];
   const server = http.createServer((req, res) => {
     assert.equal(req.headers.authorization, 'Bearer ' + token);
     let body = '';
@@ -36,6 +38,9 @@ async function main() {
       else {
         const call = JSON.parse(body);
         if (call.name === 'pcbai_status') response = { ok: true, sessions: [session] };
+        else if (call.name === 'search_parts') {partCalls.push(call); response = {ok: true, parts: [{lib_id: 'Test:R', description: '<script>data</script>'}]};}
+        else if (call.name === 'part_info') {partCalls.push(call); response = {ok: true, part: {lib_id: 'Test:R', library_sha256: 'a'.repeat(64), properties: {Footprint: 'Test:R'}}};}
+        else if (call.name === 'verify_part') {partCalls.push(call); response = {ok: true, pin_pad_match: true, stock_verified: false};}
         else if (call.name === 'start_job') {
           submitted.push(call.arguments);
           response = { ok: true, job: { job_id: 'job-test' } };
@@ -56,13 +61,16 @@ async function main() {
   fs.writeFileSync(path.join(state, 'service.json'), JSON.stringify({ port: server.address().port, token, instance: 'test-instance' }));
   const uri = (fsPath) => ({ fsPath, toString: () => fsPath });
   const vscode = {
-    workspace: { findFiles: async () => [uri(project)] },
+    workspace: { findFiles: async () => [uri(project)], openTextDocument: async options => {opened.push(options); return options;} },
     commands: { registerCommand: (name, callback) => { commands.set(name, callback); return { dispose() {} }; } },
     StatusBarAlignment: { Left: 1 }, ViewColumn: { Beside: 2 }, Uri: { file: uri },
     window: {
       createOutputChannel: () => ({ appendLine: (line) => lines.push(line), show() {}, dispose() {} }),
       createStatusBarItem: () => ({ show() {}, dispose() {} }),
       showErrorMessage: (error) => errors.push(error),
+      showInputBox: async () => 'resistor',
+      showQuickPick: async items => items[0],
+      showTextDocument: async document => document,
       createWebviewPanel: (_id, _title, _column, options) => {
         const panel = { options, webview: { cspSource: 'vscode-webview:', asWebviewUri: uri, html: '' } };
         panels.push(panel);
@@ -89,6 +97,11 @@ async function main() {
     await commands.get('pcbai.stats')();
     assert.deepEqual(errors, []);
     assert.ok(lines.some((line) => line.includes('52.07 mm')));
+    await commands.get('pcbai.searchParts')();
+    assert.deepEqual(errors, []);
+    assert.deepEqual(partCalls.map(c => c.name), ['search_parts', 'part_info', 'verify_part']);
+    assert.equal(JSON.parse(opened[0].content).pin_pad.stock_verified, false);
+    assert.equal(opened[0].language, 'json');
     // A service artifact outside exports is rejected before creating a panel.
     artifactPath = path.join(root, 'outside.png');
     fs.writeFileSync(artifactPath, 'outside');

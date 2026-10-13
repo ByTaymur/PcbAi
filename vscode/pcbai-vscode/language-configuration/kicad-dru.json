@@ -1,0 +1,8 @@
+{
+  "comments": {"lineComment": "#"},
+  "brackets": [["(", ")"]],
+  "autoClosingPairs": [{"open": "(", "close": ")"}, {"open": "\"", "close": "\"", "notIn": ["string", "comment"]}],
+  "surroundingPairs": [["(", ")"], ["\"", "\""]],
+  "folding": {"markers": {"start": "^\\s*\\(rule\\b", "end": "^\\s*\\)\\s*(?:#.*)?$"}},
+  "indentationRules": {"increaseIndentPattern": "^\\s*\\((?:rule|constraint)\\b[^)]*$", "decreaseIndentPattern": "^\\s*\\)"}
+}

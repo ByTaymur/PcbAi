@@ -1,0 +1,7 @@
+{
+  "required_tool": "kicad-cli",
+  "scope": "erc",
+  "environment": {
+    "PCBAI_KICAD_CLI": "./intentionally-absent-kicad-cli"
+  }
+}

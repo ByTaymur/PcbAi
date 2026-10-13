@@ -1,8 +1,72 @@
 # Plan — eksikler ve tamamlama sırası
 
-Tarih: 13 Ekim 2026 · Durum: **uygulama sürüyor** (çekirdek 0.1.11, VS Code 0.1.16; rota/yerleşim, parça/şematik, IR ve tek-dosya pasif blok yazımı eklendi, faz ve canlı kabuller açık) · Kaynaklar: [PLAN.md](../PLAN.md), [plan-gorunum.md](plan-gorunum.md),
+Tarih: 13 Ekim 2026 · Durum: **uygulama sürüyor** (çekirdek 0.1.22, VS Code 0.1.16; rota/yerleşim, parça/şematik, IR ve tek-dosya pasif blok yazımı eklendi, faz ve canlı kabuller açık) · Kaynaklar: [PLAN.md](../PLAN.md), [plan-gorunum.md](plan-gorunum.md),
 [status.md](status.md). Bu belge "şu an ne yok, hangi sırayla, nasıl ve ne zaman bitti sayılır" sorusunu yanıtlar.
 Uygulayan ajan her iş paketini bitirince [status.md](status.md)'ye ölçülen sonucu yazar ve buradaki satırı işaretler.
+
+## EK ilk teslim — 13 Ekim
+
+- [x] EK-0 kaynak/uyumluluk incelemesi: [matris ve sınırlar](spikes/EK0.md).
+  Pinned PyGerber 44 Gerber parse+bbox, 6 Excellon skipped; ürün entegrasyonu değil.
+- [ ] EK-1 uygulaması, VSIX ve gerçek minimum Host dil/snippet/folding ölçümü tamam;
+  KiCad 10.0.4 bozuk DRU'da exit 0 verebildiği için bozuk kural ret kabulü açık.
+- [ ] EK-2 işlevsel uygulama, yeni UI, schema/paket ve gerçek Host ölçümü tamam;
+  geniş 223-kütüphane korpusunda 150 ms sıcak hedefi açık (son p95 374,23 ms).
+  Gerçek kök/dangling junction, surrogate, eski tampon/oturum ve literal pin
+  regresyonları var; genel footprint indeksi teslim kapsamına eklenmedi.
+  [Plan](plan-eklenti-ozellikleri.md); tam tarihsel snapshot altyapısı RD-B8s açık.
+
+## 13 Ekim — RD dalga 0
+
+- [x] RD-B1/S11 uygulayan ölçümü: pinned MIT kicad-happy, beş R7 demosu, 20/20 ayrı süreç koşusu;
+  iki tekrarda ID/çıktı eşitliği, native netlist üye kalibrasyonu, PCB sayımları ve 20 elle etiket.
+  [Rapor](spikes/S11.md): 474 bulgu; 14 doğru/2 yanlış/4 belirsiz. Kaynaklar SHA-256 ile korundu.
+- [ ] RD-G2 **5/16 fixture**: #1 normal DRC temiz/parite net_conflict; #1b DRC/parite temiz ama niyetteki netler birleşik;
+  #9 ad→üye kalibrasyonu; #12 eksik zorunlu araç checks_incomplete/CLI exit 2; #13 readback_mismatch.
+  #1b, #1'in alt vakasıdır; niyet yakalayıcısı RD-C2'ye kadar yoktur.
+  Ana katalogda #2–#8, #10–#11, #14–#16 (12 satır) açık.
+- [x] Bağımsız Claude denetimi: `.venv` ile 255 test OK (3 skip: symlink + 2 motor ortamı), gerçek KiCad 11/11,
+  Ruff temiz; determinizm, 474 bulgu, pin çokluğu, 3 elle etiket ve 3 fixture gerçek KiCad ile yeniden üretildi.
+  Çürütülen iddia yok; 2 belge eksiği (yayın JSON'u, ecc83 proje adı), 3 öneri.
+  [Depoda erişilebilir denetim özeti](rd-dalga0-denetim-ozeti.md); ham rapor yerel `.pcbai-state/audit-rd-dalga0/claude-review.md`.
+- [x] Kararlar: K15, K16 adım 1, K20, K21 kabul — [0004](decisions/0004-referans-depolar.md). K16 adım 2 (vendor) açık.
+  Uygulayan test günlükleri ve PowerShell kabuk çıkışı sınırı [status.md](status.md)'de.
+- [x] **D1-0 uygulaması**: ecc83-pp adı, `.venv` komutları, dört karakterizasyon testi ve #1b fixture'ı eklendi;
+  [ölçüm ve sınırlar](status.md#d1-0-kapanış-uygulaması--13-ekim-2026). **Bağımsız denetimle kabul (`ef05261`)**:
+  kapalı editörlerle `.venv` tam takım 259 test OK, 3 skip, 693,0 sn, Python exit 0; Ruff/lisans temiz.
+  Önceki `0xC000013A` kesintileri tekrarlanmadı; tam takım doğrulaması kapandı.
+- [x] **Dalga 1 uygulaması ve hedefli denetimi** (RD-A1, A5, A2, I9, A6, A4, A3): [plan-rd-dalga1.md](plan-rd-dalga1.md).
+  S11 yayın JSON'u yalnız kullanıcının açık "yayın koşusu" talimatıyla.
+- [x] **D1-1 / RD-A1 uygulaması** (`ip/rd-a1-bulgu`, çekirdek 0.1.15): ortak şema, kararlı kimlik ve çokluk kıyası.
+  15 yeni test; tam takım 274 test OK/3 skip, gerçek KiCad 11/11 skip yok, Ruff/lisans temiz;
+  wheel şema yüklemesi doğrulandı. **Bağımsız hedefli denetim tamamlandı; 13 Ekim'de main'e alındı.** [Sonuç ve sınırlar](status.md).
+
+## 13 Ekim — gerçek WSL/TraceMaker
+
+- [x] R0/K13 ortam: yeniden başlatma sonrası WSL2/PcbAi-Ubuntu 26.04.1, pinned CPU 0.9.0
+  derleme 99/99 ve gerçek sürüm/ELF SHA. Gerçek Linux process-group timeout ölçüldü.
+- [x] R3 kısmi rota exit-3 ve yerleşim sıfır açı protokolü; son ilgili 60/60, gerçek motor entegrasyonu 2/2.
+  Tiny route iki tekrarda byte/UUID/geometri eşit; iki-pad fixture gerçek iki hareket,
+  apply/checkpoint/restore. Bağımsız son 25/25.
+- [x] R7 gerçek TraceMaker beş demo × iki rota kıyası: tüm kaynaklar korundu.
+- [ ] K5/temiz demo/yerleşim kabulü: ecc83 yeni clearance; pic 14, stickhub 29 bağlantı açık;
+  video/interf_u UUID retleri. Demo place no-op; genel yerleşim kalite kabulü yok.
+  [Son tablo](baseline-motorlar.md), [kurulum ve ölçümler](spikes/S10.md).
+
+## 13 Ekim — pasif tarif SPICE testi
+
+- [x] İP-3.3 `spice_block_test` başlangıcı: üç pasif tarifin altı varyantı gerçek ngspice ile
+  ortak el hesabına kıyaslanır. Kapalı parametreler, netlist/evidence SHA, simulated ölçümler,
+  timeout ve mismatch/eksik/NaN/type kapıları; uygulayan 52/52, bağımsız 48/48, gerçek MCP 3/3.
+- [ ] Diğer blok testbench/model kataloğu, sweep, tarif ERC/CI ve olgunluk-1 kabulü.
+  Mevcut ideal tarif testleri olgunluk 0; stock/fiziksel/anahtar sekmesi doğrulanmadı.
+  [Sözleşme](ir.md), [ölçümler](status.md).
+
+## 13 Ekim — TraceMaker envanteri
+
+- [x] Pinned TraceMaker CLI sürüm alt komutu düzeltildi; uygulayan 57/57, bağımsız 55/55.
+  Bu arayüz denetimi Linux motor kabulü değildir; WSL yeniden başlatma/derleme ve demo kıyası açık.
+  [Ölçümler](status.md).
 
 ## 12 Ekim — IR ve pasif blok çatısı
 
@@ -65,20 +129,21 @@ Uygulayan ajan her iş paketini bitirince [status.md](status.md)'ye ölçülen s
   kaynakla eşleşen **VS Code 0.1.16 yüklendi**. Gerçek Extension Host motor/elle kabulü açık.
 - [x] R7 kıyas **betiği**: beş KiCad demosu × iki gerçek JAR koşusu;
   [güncel yerel tablo](../.pcbai-state/s4-current.md), [S4](spikes/S4.md).
-- [ ] R0/R2/S10: WSL kurulumuna izin verildi, Windows bileşenleri kuruldu; yeniden başlatma,
-  Ubuntu, TraceMaker cpu-only derleme ve gerçek rota/yerleşim/timeout/determinizm ölçümü gerekiyor.
+- [x] R0/K13: WSL2/Ubuntu/pinned CPU derleme ve gerçek süreç sınırı ölçüldü.
+- [ ] R2/S10: anlamlı yerleşim ve temiz demo kalite kabulü açık; gerçek rota kıyası kaydedildi.
 - [ ] R1/R5/R6 motor kalite kabulü ve R7/K5 seçimi: ecc83/pic_programmer yeni DRC;
   video/interf_u kaynak UUID tekrarı; stickhub korunan öğe farkı. Engeller gevşetilmedi.
 - [x] SPICE güvenlik düzeltmesi: nested model dosyaları denetlenip bellekte açılır;
   dosya kaynaklı/dış süreç çalışan modeller ve izin dışı direktifler reddedilir.
 
-K12 ayrı program/paketlememe sınırı uygulanır; K13 kurulum onaylı ama ortam hazır değil;
+K12 ayrı program/paketlememe sınırı uygulanır; K13 ortamı gerçek WSL2/CPU derlemeyle ölçüldü;
 K14 kullanıcı seçimiyle **yalnız KiCad demoları**. [Karar](decisions/0003-engines.md).
 Bu paket Faz 2–4'ün parça/şematik/IR/blok işlerini, Faz 5 senkron/DFM/üretim işlerini veya
 Faz 7 orkestrasyon/fiziksel kart kabulünü kapatmaz. Test ve bağımsız denetim sonuçları status.md'de.
 
 Yeni (13 Ekim): sekiz referans deponun kaynak incelemesinden çıkan geliştirme planı — denetim katmanı,
-bağımsız üretim doğrulaması, datasheet güven kapısı; paketler RD-A…RD-H, dalga 0'da S11 →
+bağımsız üretim doğrulaması, datasheet güven kapısı; ekosistem araçları (KiKit, InteractiveHtmlBom, KiRI,
+pygerber, KLC denetçisi, pyplacer…); paketler RD-A…RD-I, dalga 0'da S11 →
 [plan-referans-depolar.md](plan-referans-depolar.md).
 
 ## 0. Başlangıç durumu (11 Ekim 2026, ölçülen)
@@ -273,3 +338,21 @@ Bu depoda Codex ve Claude Code aynı anda çalışıyor. Çakışmayı önlemek 
 Testler yeşil (KiCad açıksa atlanan yazma testleri KiCad kapalıyken ayrıca koşulmuş) · ruff temiz · ilgili belge
 güncel · ölçülen sonuç `docs/status.md`'de · görünüm işiyse tarayıcı testi ve ekran görüntüsü · kullanıcıya görünen
 işse kurulu sürümde elle denenmiş · commit edilmiş.
+
+- [x] D1-2 uygulaması: Kimlikli limit kaydı ve docs/limits.md eklendi. 2 limit testi OK, Ruff exit 0; dosya/belge kanıt bağlantıları doğrulandı. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- [x] D1-3 uygulaması: check aracı ve checks_run manifesti eklendi; eksik/çöken kontrol incomplete, excluded bulgu findings olur. 27 hedefli test OK, Ruff exit 0; gerçek fixture #1 pariteyi yakaladı. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- [x] D1-4 uygulaması: pcbai check komutu eklendi; gerçek alt süreçlerde 0/1/2 çıkışları ve JSON doğrulandı. 5 CLI testi OK; Ruff exit 0. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- [x] D1-5 uygulaması: Engine.call üzerinde içeriksiz audit.jsonl eklendi: süreç/iş parçacığı kilidi, 10 MB tek yedek, yazma hatasında uyarı. 17 audit/job/manifest testi OK, Ruff exit 0; argüman metni loglanmaz. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- [x] D1-6/RD-A4 uygulaması: Kalibrasyon: 10 test gerçek beş demo ile geçti (40,209 sn, skip yok). Net bölümlemesi beşinde eşit; pic_programmer 19 çokluk farkı ve iki demoda ad seçimi farkları bağımlı dedektörleri engeller. UUID kapsamı yalnız açık native sayfa eşlemesiyle normalleştirilir. CLI iz sayısı sunmadığından segment/arc toplamı kaydedilmiş geometriyle ölçülür. A2 hata manifestinde istenen parite ve giriş hashleri bağımsız denetim bulgusuna göre düzeltildi. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- [x] D1-7/RD-A3 uygulaması: 13 yazma aracında disk SHA ve bağımsız niyet geri okuması, checkpoint geri yükleme önerisi ve MCP changed=true hata sözleşmesi eklendi. 50 readback/Engine testi OK, gerçek connect/add_block netlisti dahil; 13 semantik yazım enjeksiyonu ve SHA doğru yanlış aday testleri geçti. Fixture #13 eklendi (5/16). Bağımsız denetim iki hata yolunu buldu; proje kapsamı ve yazım sonrası kayıp belge yanıtları düzeltildi. Ruff .venv executable exit 0. Bağımsız hedefli Codex denetimi tamamlandı; son dalga ölçümü status.md içinde.
+
+- RD-G2 #13 niyet geri okuması fixture'ı eklendi; #1b mevcut modelin niyet ihlali hâlâ L-NO-INTENT-CHECK sınırıdır.
+
+- [x] Dalga 1 denetim düzeltmeleri (0.1.22): cp1252 güvenli JSON, audit ek taramasının kaldırılması ve PCM metadata 0.1.14 başlığı. 76 hedefli test OK/100,030 sn; bağımsız CLI/audit kabulü, Ruff/lisans temiz. 337-test genel ölçümü 0.1.21 içindir. Çalışan servis takım bitince yeniden başlatılmalı; önizlemeler yeniden oluşturulur.
+
+- [x] Dal entegrasyonu (13 Ekim): tüm `ip/*` dalları main'e alındı, birleşen dallar silindi; 0.1.22 tam takım 342 OK/11 skip, Ruff temiz. G2-f gerçek yazım testi KiCad kapalı koşuda yeniden ölçülmeli. [Ölçüm](status.md).

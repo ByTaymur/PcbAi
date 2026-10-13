@@ -45,6 +45,26 @@ class EngineTests(unittest.TestCase):
         self.assertFalse(engine.call("project_summary", {})["ok"])
         self.assertFalse(engine.call("project_summary", {"session": "guess"})["ok"])
 
+    @patch("pcbai.tools.engine.rule_check", return_value=CLEAN)
+    def test_readback_value_scope_preserves_foreign_project_reference(self, check):
+        from pcbai.sexpr import Document
+        from tests.helpers import SCHEMATIC
+        physical = Document(SCHEMATIC).root.child("symbol")
+        first = SCHEMATIC[physical.start:physical.end - 1] + b'''(instances (project "Test"
+            (path "/11111111-1111-4111-8111-111111111111" (reference "R1") (unit 1)))))'''
+        second = SCHEMATIC[physical.start:physical.end - 1].replace(b"22222222", b"33333333") + b'''(instances (project "Other"
+            (path "/99999999-9999-4999-8999-999999999999" (reference "R1") (unit 1)))))'''
+        path = self.project.parent / self.document
+        path.write_bytes(SCHEMATIC[:physical.start] + first + second + SCHEMATIC[physical.end:])
+        self.base = self.engine.sessions.get(self.session).target(self.document)
+        preview = self.preview()
+        self.assertTrue(preview["ok"], preview)
+        applied = self.apply(preview["candidate_id"])
+        self.assertTrue(applied["ok"], applied)
+        self.assertEqual(applied["readback"]["mismatches"], [])
+        self.assertEqual(path.read_bytes().count(b'"4k7"'), 1)
+        self.assertEqual(path.read_bytes().count(b'"10k"'), 1)
+
     def test_arguments_strictly_validated(self):
         for args in [dict(session=self.session, executable="evil"), {"session": 3}, None, []]:
             output = self.engine.call("project_summary", args)
@@ -156,7 +176,8 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(applied["affected_instances"], preview["affected_instances"])
         self.assertEqual(applied["warnings"], preview["warnings"])
         self.assertFalse((self.project.parent / ".pcbai-write.lock").exists())
-        self.assertEqual(len(list((self.engine.state / "locks").glob("*.lock"))), 1)
+        # One project transaction lock plus the independent cross-process audit lock.
+        self.assertEqual(len(list((self.engine.state / "locks").glob("*.lock"))), 2)
 
     @patch("pcbai.tools.engine.rule_check", side_effect=[CLEAN, RuntimeError("post-check failure")])
     def test_shared_impacts_survive_verification_failure(self, _check):

@@ -173,13 +173,23 @@ def guard(before, after, *, operation="route", reroute=False, allow_flip=False):
             planned = plan_move(before, ref, *pos, angle(b), "back" if layer_b.value() == "B.Cu" else "front")
             expected = footprint_by_reference(board(planned["data"]), ref)
             # No value, pad/net, courtyard or graphical content may change beyond measured move/flip rules.
-            if planned["data"][expected.start:expected.end] != after[b.start:b.end]:
+            if placement_bytes(planned["data"], expected) != placement_bytes(after, b):
                 changed(a, "Footprint changed beyond the permitted move/rotation/flip")
             moved.append(dict(reference=ref, uuid=key, before=xy(a), after=pos))
     if diffs:
         raise PcbAiError("engine_touched_foreign_items", "Engine changed protected PCB data",
                          details={"differences": diffs[:50]})
     return dict(clean=True, moved=moved)
+
+
+def placement_bytes(data, footprint):
+    """Only the movable top-level position may omit its zero angle; all other bytes stay protected."""
+    value = data[footprint.start:footprint.end]
+    at = footprint.child("at")
+    if at is not None and len(at.children) == 3 and all(n.atom is not None for n in at.children):
+        offset = at.end - footprint.start - 1
+        value = value[:offset] + b" 0" + value[offset:]
+    return value
 
 
 def without(data, node, names):

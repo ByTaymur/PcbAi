@@ -1,0 +1,7 @@
+{
+  "Clearance example": {"prefix": "pcbai-clearance", "description": "Düzenlenebilir aralık örneği; üretici kabulü değildir.", "body": ["(rule \"${1:clearance example}\"", "  (condition \"A.NetClass == '${2:Default}'\")", "  (constraint clearance (min ${3:0.2mm}))", ")", "$0"]},
+  "Track width example": {"prefix": "pcbai-track-width", "description": "Düzenlenebilir iz genişliği örneği.", "body": ["(rule \"${1:track width example}\"", "  (condition \"A.NetClass == '${2:Default}'\")", "  (constraint track_width (min ${3:0.2mm}) (opt ${4:0.25mm}))", ")", "$0"]},
+  "Via dimensions example": {"prefix": "pcbai-via", "description": "Düzenlenebilir via çapı/delik örneği.", "body": ["(rule \"${1:via example}\"", "  (condition \"A.Type == 'Via'\")", "  (constraint via_diameter (min ${2:0.6mm}))", "  (constraint hole_size (min ${3:0.3mm}))", ")", "$0"]},
+  "Keepout example": {"prefix": "pcbai-keepout", "description": "İsimli kural alanında yasak öğe örneği; alan adı düzenlenmeli.", "body": ["(rule \"${1:keepout example}\"", "  (condition \"A.intersectsArea('${2:Keepout}')\")", "  (constraint disallow track via)", ")", "$0"]},
+  "Length matching example": {"prefix": "pcbai-length-match", "description": "Net sınıfı için düzenlenebilir skew örneği.", "body": ["(rule \"${1:length match example}\"", "  (condition \"A.NetClass == '${2:Default}'\")", "  (constraint skew (max ${3:0.5mm}))", ")", "$0"]}
+}

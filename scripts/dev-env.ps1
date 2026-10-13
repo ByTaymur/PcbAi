@@ -1,4 +1,13 @@
 # Dot-source this file: . ./scripts/dev-env.ps1
+# Existing terminals may predate installation; preserve process overrides and load saved user settings.
+foreach ($taskEngineVariable in @('PCBAI_TRACEMAKER', 'PCBAI_TRACEMAKER_PLACE')) {
+    if (-not [Environment]::GetEnvironmentVariable($taskEngineVariable, 'Process')) {
+        $taskEngineSetting = [Environment]::GetEnvironmentVariable($taskEngineVariable, 'User')
+        if ($taskEngineSetting) {
+            [Environment]::SetEnvironmentVariable($taskEngineVariable, $taskEngineSetting, 'Process')
+        }
+    }
+}
 $taskRoot = Split-Path $PSScriptRoot -Parent
 $taskVenv = Join-Path $taskRoot '.venv\Scripts'
 if (Test-Path -LiteralPath (Join-Path $taskVenv 'python.exe')) {

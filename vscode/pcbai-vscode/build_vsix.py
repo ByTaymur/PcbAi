@@ -5,13 +5,14 @@ Install:  code --install-extension <vsix> --force
 The PcbAi checkout path is written into the package as the default "pcbai.root".
 """
 import json
+import argparse
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-INCLUDE = ["package.json", "extension.js", "board_view.js", "sch_view.js", "view3d.js", "sidebar_view.js", "engine_view.js", "README.md"]
+INCLUDE = ["package.json", "extension.js", "board_view.js", "sch_view.js", "view3d.js", "sidebar_view.js", "engine_view.js", "part_assist.js", "README.md"]
 
 CONTENT_TYPES = """<?xml version="1.0" encoding="utf-8"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -43,7 +44,16 @@ MANIFEST = """<?xml version="1.0" encoding="utf-8"?>
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--service-root', type=Path, default=ROOT, help='Configured checkout with the service .venv')
+    args = parser.parse_args()
+    service_root = args.service_root.resolve()
+    if not (service_root / 'pcbai/__init__.py').is_file():
+        parser.error('Service root must contain PcbAi core')
     pkg = json.loads((HERE / "package.json").read_text(encoding="utf-8"))
+    schema = HERE / 'schemas/circuit.schema.json'
+    if schema.is_file() and schema.read_bytes() != (ROOT / 'pcbai/ir/circuit.schema.json').read_bytes():
+        raise ValueError('Bundled IR schema differs from canonical core schema')
     # The extension has its own version: VS Code caches an installed version's manifest, so every
     # extension change needs a new version even when the core is unchanged.
     dist = HERE / "dist"
@@ -58,10 +68,11 @@ def main():
         for name in INCLUDE:
             z.write(HERE / name, "extension/" + name)
         z.write(ROOT / "LICENSE", "extension/LICENSE")
-        for path in sorted((HERE / "media").rglob("*")):
-            if path.is_file():
-                z.write(path, "extension/" + path.relative_to(HERE).as_posix())
-        z.writestr("extension/defaults.json", json.dumps({"root": str(ROOT)}, ensure_ascii=False))
+        for folder in ("media", "syntaxes", "snippets", "language-configuration", "schemas"):
+            for path in sorted((HERE / folder).rglob("*")):
+                if path.is_file():
+                    z.write(path, "extension/" + path.relative_to(HERE).as_posix())
+        z.writestr("extension/defaults.json", json.dumps({"root": str(service_root)}, ensure_ascii=False))
     print(out)
 
 

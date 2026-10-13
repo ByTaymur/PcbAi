@@ -238,3 +238,35 @@ geçti, maddi bulgu yok. İlk B023 loop-capture uygulayan tarafından düzeltild
 Son uygulayan full243/242pass/1skip833,536s ve ayrıCLI11/11 262,264s; Ruff/lisans/wheel temiz.
 Kesilen önceki full log korunur; başarısız/yarım koşu tamamlandı gibi sayılmaz. WSL yenidenbaşlatma
 gereksinimi ve ürünün açık fiziksel/IR/stock/AF kabulü ayrı sınırdır.
+
+## 13 Ekim 2026 — TraceMaker inventory arayüzü, 0.1.12
+
+Kaynak c6fcb7b4912bdabefeb7f4191c011b1a086335e0: version subcommand/lowercase prefix;
+PcbAi --version yanlışını düzeltir, GPL kaynak kopyalamaz. Strict protokol/nonzero-query ve
+native/WSL argv farkları uygulayan57/57 145,153s; bağımsız55/55 16,081s ve gerçekfakechild
+ayrıca geçti. Ruff/lisans temiz, kalan maddi bulgu yok; rapor `.pcbai-state/audit-all-plan/tracemaker-version-review.md`.
+Önceki243full yeni3testi kapsamıyor; gerçekLinux/WSL/boardquality/timeout ölçümü yapılmadı.
+
+## 13 Ekim 2026 — pasif tarif SPICE, 0.1.13
+
+Üç tarif/altı varyant gerçek ngspice; uygulayan final52/52 5,226s, bağımsız48/48 4,651s.
+Bağımsız gerçek kısa-devre mutation ve yanlış-ölçüm API mismatch/evidence kontratı ölçüldü.
+P2 ACscale boolimag uygulayan tarafından düzeltildi, finalprobe/test kapandı.
+Ruff/lisans/wheel/core-only temiz; rapor `.pcbai-state/audit-all-plan/passive-spice-review.md`.
+Mutlak taban toleransları açık; tiny/zero uyarım topology acceptance değildir. Olgunluk0,
+tarif ERC/CI/stock/hardware ve WSL/Linux motor kabulleri açık kalır.
+
+## 13 Ekim 2026 — gerçek WSL/TraceMaker, 0.1.14
+
+PinnedCPU99/99build,0.9.0ELF;actualLinuxTERM/KILLparent+child temizliği ölçüldü.
+Uygulayan ilgili59/59 17,572s, gerçekconfiguredmotor2/2 329,263s; önceki252full bu sonfarkı kapsamıyor.
+Actualexit3partial/1fatal protokolü düzeltildi; cp1254stdout ve Processoverride/Userfallback doğrulandı.
+Bağımsızprotocol/route24/24 5,130s; tinyroute raw/UUID/geometry repeat +apply/restore geçti.
+Beşdemo2repeat allsourcepreserved; üçölçülençift rawsha aynı. Ecc83 yenierror, pic/stickhub incomplete,
+video/interfUUIDret; placeno-op. Bunlar K5/fiziksel/yerleşim kabulü değildir; varsayılan seçilmedi.
+
+Son üst-düzey sıfır açı omission P2 düzeltmesi sonrası ilgili60/60 12,933s; sadece izinli at node
+eşdeğerliği, diğerprotectedbytes ve lock/route kapıları korunur. Scratchpile0→2URapplyreddi ölçüldü.
+FinalwheelSHA45004376b7ec904237e4e148d358f1d4547878dfbbbe49ac3abdd5decae3a171.
+Bağımsız final25/25 3,315s; yeniayrık2padfixture moved2/UR2→2/blockers[]/gerçekapply+restore
+ölçüldü. Demo sourcekilitleri açılmadı; genelyerleşim kalite kabulü açık.

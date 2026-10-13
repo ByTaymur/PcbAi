@@ -1,12 +1,14 @@
-# Uygulanmış araçlar — 0.1.8
+# Uygulanmış araçlar — 0.1.22
 
 | Araç | Girdi / sonuç |
 |---|---|
 | pcbai_status | Oturumlar, kökler, kaydedilmiş revizyon ve yetenekler |
 | doctor | Gerçek kurulum yolları ve sürümleri; bulunma ve test edilmiş olma ayrı |
+| check | session/scope=sch\|pcb\|all; ERC, DRC, ayrı parite ve board_stats manifesti. checks_ok / checks_findings / checks_incomplete; atlanan veya çöken zorunlu kontrol temiz sayılmaz. CLI: `python -m pcbai check <proje.kicad_pro> --scope all --json`, çıkış 0/1/2 |
 | search_parts | query/limit?; kurulu KiCad veya PCBAI_SYMBOLS kütüphanelerinin özel FTS5 metadata dizini, kalıtılan alanlar, SHA-256 yenileme; katalog/stok araması değildir |
 | circuit_blocks | Yerleşik üç pasif tarif, sürüm/parametre şeması/portlar; olgunluk 0, stok ve tarif kabulü yok |
 | hand_calc | calculation/params; sabit formüller, boyutlu SI ayrıştırma, özgün/normalize girdiler, birimli sayılar ve evidence_id; fiziksel kabul değildir |
+| spice_block_test | block/params; üç pasif tarifin ideal topolojisi gerçek ngspice ile el hesabına kıyaslanır. Ölçüm/hata/tolerans/passed, netlist SHA ve kanıt; kullanıcı projesi yazılmaz, ERC/stok/fiziksel kabul ve olgunluk artışı yok. [Sözleşme](ir.md) |
 | plan_circuit | ir; kapalı Draft2020 IR, gerçek yerel literal pin/pad, ray/net ve pasif blok genişletmesi; proje dosyası yazmaz, electrical=incomplete, ready_to_apply=false. [IR sözleşmesi](ir.md) |
 | add_block | session/document/revision/mode; preview: block/params/instance/x_mm/y_mm, apply: yalnız candidate_id. Üç pasif tarif, tek frozen aday/checkpoint, global anotasyon, yalıtılmış yerel netler, exact native üyeler; yeni ERC hatası apply'i engeller. Olgunluk 0. [Sınırlar](ir.md) |
 | part_info | lib_id/kind=symbol veya footprint; katı kalıtım çözümü, birimler/pinler veya padler, kaynak karması, güvenilmeyen metadata |
@@ -180,3 +182,12 @@ determinizm iddia edilmez. Kaydedilmemiş canlı PCB yazması veya üretim onay�
 SPICE: iç içe `.include` / seçili `.lib` içerikleri sınır, döngü, boyut ve direktif/model izin listesi
 denetiminden sonra bellekte açılır. `.control` çalıştırılmaz; dosya kaynaklı ve dış süreç çalıştıran
 XSPICE model türleri reddedilir. Genel üretici modellerinin tamamını destekleme iddiası yoktur.
+
+Yazma sonrası `readback.checked` ve `readback.mismatches` disk SHA ve bağımsız niyet ölçümünü taşır.
+`ok=false, changed=true, verified=readback_mismatch` dosyanın yazıldığı ama doğrulamanın uyuşmadığı anlamına gelir.
+Checkpoint ve `suggested_restore` incelenir; geri yükleme yeni önizleme ister. Otomatik tekrar veya geri alma yapılmaz.
+Başarılı ERC/DRC mevcut modelin kontrolüdür; [#1b niyet sınırı](limits.md) ve fiziksel kabul açık kalır.
+
+CLI JSON çıktısı konsol kod sayfasından bağımsız ASCII Unicode kaçışları kullanır; JSON ayrıştırıldığında
+Türkçe ve diğer Unicode metinler kayıpsız geri gelir. Araç denetim kaydı doğrulanan hedefi kullanır;
+güvenlik kontrollerine ek bir proje hash taraması yapmaz.

@@ -1,0 +1,17 @@
+{
+  "source": "design intent: two separate sense nets; deliberately violated by duplicate local labels",
+  "nets": {
+    "/SENSE_A": [
+      [
+        "J1",
+        "1"
+      ]
+    ],
+    "/SENSE_B": [
+      [
+        "J2",
+        "1"
+      ]
+    ]
+  }
+}

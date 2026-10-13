@@ -20,6 +20,9 @@ DEMOS = ["ecc83", "pic_programmer", "video", "interf_u", "stickhub"]
 
 
 def main():
+    # A Windows redirected console may use cp1254; Unicode summaries must not abort a measured run.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="backslashreplace")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--engines", nargs="+", choices=["tracemaker", "freerouting"], default=["freerouting", "tracemaker"])
     parser.add_argument("--demos", nargs="+", choices=DEMOS, default=DEMOS)
