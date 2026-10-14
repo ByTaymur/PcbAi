@@ -68,6 +68,7 @@ def client_for(project):
 
     os.environ["PCBAI_PROJECTS"] = json.dumps([str(project)])
     client = Client()
+    client.client_name = "kicad"
     try:
         client.connect()
         return client
@@ -90,6 +91,7 @@ def client_for(project):
             break
     os.environ["PCBAI_PROJECTS"] = json.dumps(projects)
     client = Client()
+    client.client_name = "kicad"
     client.connect()
     return client
 

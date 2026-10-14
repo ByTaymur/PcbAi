@@ -6,6 +6,7 @@ from bisect import bisect_left
 from pcbai.blocks.registry import expand
 from pcbai.core.contract import PcbAiError
 from pcbai.sim.runner import sanitize, simulate_lines
+from pcbai.sim.coverage import coverage, meets_threshold
 
 
 def bench(block, params):
@@ -117,15 +118,20 @@ def measure(block, params, recipe, output):
     return checks
 
 
-def test_block(block, params, cwd):
+def test_block(block, params, cwd, *, min_coverage=None):
     recipe, lines, vectors = bench(block, params)
+    models = coverage([dict(reference=p["id"], active=False, connected=True, lib_id=p["symbol"])
+                       for p in recipe["parts"]], lines)
+    if not meets_threshold(models, min_coverage):
+        return dict(block=block, coverage=models, verification="checks_incomplete", checks=[],
+                    passed=False, original_inputs=params, min_coverage=min_coverage)
     output = simulate_lines(lines, cwd, vectors, max_points=20000, timeout=60)
     checks = measure(block, params, recipe, output)
     passed = all(c['passed'] for c in checks)
     return dict(block=block, recipe_version=recipe['version'], testbench_version=1, maturity=0,
                 verification='simulated' if passed else 'simulation_mismatch', passed=passed,
                 checks=checks, calculation=recipe['calculation'], parts=recipe['parts'],
-                netlist=lines, netlist_sha256=hashlib.sha256('\n'.join(lines).encode()).hexdigest(),
+                netlist=lines, netlist_sha256=hashlib.sha256('\n'.join(lines).encode()).hexdigest(), coverage=models,
                 simulator_plot=output['plot'], erc_verified=False, stock_verified=False, physically_verified=False,
                 assumptions=['Ideal R/C and ideal source; no tolerance, parasitics or source impedance',
                              'Generated recipe topology; no user schematic or installed part model tested'],

@@ -1,14 +1,15 @@
-# Uygulanmış araçlar — 0.1.22
+# Uygulanmış araçlar — 0.1.26
 
 | Araç | Girdi / sonuç |
 |---|---|
 | pcbai_status | Oturumlar, kökler, kaydedilmiş revizyon ve yetenekler |
 | doctor | Gerçek kurulum yolları ve sürümleri; bulunma ve test edilmiş olma ayrı |
+| model_coverage | Kök şematik native XML → güvenli SPICE yapısal model bağlama; bound/unbound/bindings, bütün/aktif oranları. min_coverage? işçi öncesi eksik kapsam kapısı; analiz komutu gerekmez. Pin/gerçek model/fiziksel kabul değildir. [Sınırlar](spikes/R2-A3.md) |
 | check | session/scope=sch\|pcb\|all; ERC, DRC, ayrı parite ve board_stats manifesti. checks_ok / checks_findings / checks_incomplete; atlanan veya çöken zorunlu kontrol temiz sayılmaz. CLI: `python -m pcbai check <proje.kicad_pro> --scope all --json`, çıkış 0/1/2 |
 | search_parts | query/limit?; kurulu KiCad veya PCBAI_SYMBOLS kütüphanelerinin özel FTS5 metadata dizini, kalıtılan alanlar, SHA-256 yenileme; katalog/stok araması değildir |
 | circuit_blocks | Yerleşik üç pasif tarif, sürüm/parametre şeması/portlar; olgunluk 0, stok ve tarif kabulü yok |
 | hand_calc | calculation/params; sabit formüller, boyutlu SI ayrıştırma, özgün/normalize girdiler, birimli sayılar ve evidence_id; fiziksel kabul değildir |
-| spice_block_test | block/params; üç pasif tarifin ideal topolojisi gerçek ngspice ile el hesabına kıyaslanır. Ölçüm/hata/tolerans/passed, netlist SHA ve kanıt; kullanıcı projesi yazılmaz, ERC/stok/fiziksel kabul ve olgunluk artışı yok. [Sözleşme](ir.md) |
+| spice_block_test | block/params/min_coverage?; üç pasif tarifin ideal topolojisi gerçek ngspice ile el hesabına kıyaslanır. Ölçüm/hata/tolerans/passed, model coverage, netlist SHA ve kanıt; kullanıcı projesi yazılmaz, ERC/stok/fiziksel kabul ve olgunluk artışı yok. [Sözleşme](ir.md) |
 | plan_circuit | ir; kapalı Draft2020 IR, gerçek yerel literal pin/pad, ray/net ve pasif blok genişletmesi; proje dosyası yazmaz, electrical=incomplete, ready_to_apply=false. [IR sözleşmesi](ir.md) |
 | add_block | session/document/revision/mode; preview: block/params/instance/x_mm/y_mm, apply: yalnız candidate_id. Üç pasif tarif, tek frozen aday/checkpoint, global anotasyon, yalıtılmış yerel netler, exact native üyeler; yeni ERC hatası apply'i engeller. Olgunluk 0. [Sınırlar](ir.md) |
 | part_info | lib_id/kind=symbol veya footprint; katı kalıtım çözümü, birimler/pinler veya padler, kaynak karması, güvenilmeyen metadata |
@@ -24,10 +25,11 @@
 | scene_pcb | session/document/revision?; mm cinsinden footprint, pad, iz/yay, via, bölge ve kenar geometri dizini |
 | render_pcb | session/document/revision; layers?; revizyon önbelleğinde KiCad katman SVG’leri ve ölçülen mm↔SVG matrisleri |
 | hit_test | session/document/x_mm/y_mm; layers?, tolerance_mm?; görünür öğeler ve mesafeleri |
-| simulate | session/kök şematik/revision?; vectors?, max_points?; şematikteki tek `.tran/.ac/.dc/.op` komutu KiCad'in ngspice'ıyla; vektörler, min/max/final, kanıt kimliği. `.control` atılır; model dosyası proje/KiCad dışında ise ret ([S5](spikes/S5.md)) |
+| simulate | session/kök şematik/revision?; vectors?, max_points?, min_coverage?; şematikteki tek `.tran/.ac/.dc/.op` komutu KiCad'in ngspice'ıyla; model coverage, vektörler, min/max/final, kanıt kimliği. `.control` atılır; model dosyası proje/KiCad dışında ise ret ([S5](spikes/S5.md), [kapsam](spikes/R2-A3.md)) |
 | render_3d | session/PCB/revision; KiCad GLB (ipek, maske, pad), boyut/karma, `components` (GLB düğüm adı = footprint referansı), `without_model`, `display_model_substitutions` |
 | render_sch | session/kök şematik/revision; her sayfa örneği için KiCad SVG’si, ölçülen mm↔SVG matrisi, sayfa adı/UUID yolu/dosyası ve KiCad netlisti |
 | scene_sch | session/kök şematik/revision?/sheet (UUID örnek yolu); sembol (örnek referansı, birim, gövde sınırı), pin (bağlantı noktası, net), tel, bus, etiket, bağlantı, alt sayfa ve pinleri; `net_members` ve sayfa listesi |
+| readable_netlist | session/kök şematik/revision?; nets?, max_chars? (1000–60000, varsayılan 12000), expand_large?, include_unconnected?; net başına `NET <ad>  (n pins[, power])` ve pin başına `REF.PIN  pin adı  (pin türü)  değer [kütüphane parçası]` metni, `netlist_sha256`, `nets_total/written/omitted`, `truncated`, `summarized_nets`, `unconnected_skipped` |
 | hit_test_sch | session/kök şematik/sheet/x_mm/y_mm; tolerance_mm?; sayfa örneğindeki öğeler |
 | get_markers | session; projedeki işaretler, HMAC güveni, markers_revision ve UUID bağı çözümü; bağlı işarette `target_item` (referans/değer/pin/net) |
 | update_marker_status | session/document/revision/markers_revision/mode; preview: n/status/reason, done için change_id; apply: candidate_id |
@@ -36,9 +38,13 @@
 | schematic_pdf | session + .kicad_sch; özel durum klasöründe PDF ve SHA-256 |
 | board_stats | session + .kicad_pcb; gerçek CLI geometri/footprint ölçümleri, ham JSON ve kanıt kimliği |
 | render_board | session + .kicad_pcb; side, width/height (64–2048); kopyadan PNG, gerçek piksel boyutu ve SHA-256 |
-| export_fab | session + .kicad_pcb; kopyada Gerber/delik ZIP, kaynak revizyonu ve her dosyanın karması |
+| export_fab | session + .kicad_pcb + assembly?; kopyada Gerber/delik/IPC-D-356/mm ham POS iki yüz/JSON stats ZIP, assembly pasta; role/layer/hash manifesti, production_verified=false. [Sınırlar](spikes/R2-B1.md) |
 | start_job | session/document/revision/tool; ERC/DRC/PDF/PNG/SVG/stats/fab salt okunur arka plan işi |
 | job_status | job_id; queued/running/completed/failed, hedef, zamanlar ve asıl araç sonucu |
+| get_waivers | session; `pcbai-waivers.json` (proje kökü) kayıtları, `waivers_revision`, `max_days` ve süre politikasını aşan kayıt kimlikleri (`policy_exceeded`) |
+| set_waiver | session/.kicad_pro/revision/waivers_revision/mode; preview: waiver={finding_id, reason, owner, created, expires}; apply: candidate_id. Checkpoint + SHA geri okuma |
+| delete_waiver | aynı hedef; preview: finding_id; apply: candidate_id. Politikayı aşan kayıt da silinebilir |
+| restore_waivers | aynı hedef; preview: checkpoint_id (`design_history`, belge `pcbai-waivers.json`); apply: candidate_id. Bozuk dosyada da çalışır (`get_waivers` hatası ham `waivers_revision` döner); boş checkpoint dosyayı kaldırır. Mevcut bayt önce checkpoint'e alınır |
 | set_value | session/document/revision/mode; preview: reference/value; apply: candidate_id |
 | add_symbol | session/şematik/revision/mode; preview: lib_id/reference/x_mm/y_mm, unit/value/footprint/rotation_deg/mirror?; 1,27 mm ızgara, açık referans; mevcut proje önbelleği korunur |
 | connect | aynı hedef; preview: name, endpoints=[{reference,pin,unit?}], kind=local/global?; pin noktalarında etiket, gerçek kök netlistinde ortak net ve bütün üyeleri ölçülür |
@@ -72,7 +78,27 @@ Dosya okuma/denetim/çıktı araçları isteğe bağlı `revision` kabul eder; e
 iş devam eder. `job_status` belge kilidini beklemez. İstek kapanınca işlem yeniden gönderilmez.
 Sonuçtaki `job.result.ok` asıl işin başarısını belirtir; durum yoklamasının `ok=true` olması işin
 geçtiği anlamına gelmez. Servis yeniden başlarsa işler/kimlikler kaybolur; `unknown_job` döner.
-Kapatma devam eden işleri bekler; yeni işler reddedilir. Yazma araçları arka plan işine alınamaz.
+Kapatma yeni işleri reddeder ve devam eden işleri en fazla 10 sn bekler; motor alt süreçleri kendi zaman
+aşımlarıyla biter. Yazma araçları arka plan işine alınamaz.
+
+MCP üzerinden `autoroute`/`autoplace` önizlemesi (`mode=preview`) otomatik olarak `start_job` ile çalışır ve
+`job_status` ile yoklanır; tek HTTP isteğinin 150 sn sınırına takılmaz. İş `PCBAI_MCP_JOB_WAIT` (varsayılan 120 sn)
+içinde bitmezse sonuç `status=running` ve `job.job_id` döner; ajan aracı yeniden çağırmaz, `job_status` ile yoklar.
+Bir yazım isteği zaman aşımına uğrarsa sonuç `error.code=service_timeout`, `changed=null` olur: dosyanın değişip
+değişmediği bilinmez, yeniden denemeden önce revizyon ve checkpoint'ler okunur.
+
+Muafiyet süre politikası (`PCBAI_WAIVER_MAX_DAYS`, 1–365) kayıt başına uygulanır: politika düşürülünce uzun kayıtlar
+dosyayı geçersiz kılmaz, `policy_exceeded_waivers` olarak görünür, hiçbir bulguyu muaf tutmaz ve silinebilir.
+365 günü aşan kayıt her politikada geçersizdir.
+
+Açık editör denetimi: varsayılan `PCBAI_EDITOR_CHECK=any` makinede herhangi bir KiCad süreci açıkken dosya yazımını
+reddeder (proje yöneticisinde açılan editörler ayrı süreç görünmez). `project` seçilirse önce projenin KiCad kilit
+dosyaları denetlenir, sonra yalnız komut satırı bu projenin yolunu içeren (ya da okunamayan) KiCad süreci engeller;
+başka projeyle açık KiCad yazımı durdurmaz. Bu mod KiCad'in kilit dosyası yazmasına güvenir.
+
+Revizyon hesabı dosya özetlerini (inode, boyut, mtime_ns, ctime_ns) aynı kaldıkça yeniden kullanır; son 2 sn içinde
+değişmiş dosya önbelleğe alınmaz. İş geçmişinde yalnız son 20 biten işin tam sonucu tutulur, eskiler
+`result_trimmed=true` ile ok/özet/hata olarak kalır.
 
 IPC için `ipc` bağımlılığı ve etkin KiCad API gerekir. `discover_ipc` yalnız okur; ayarları açmaz.
 `PCBAI_KICAD_SOCKETS` yapılandırması JSON `ipc://` kanal listesi kabul eder (en fazla 16);
@@ -92,6 +118,12 @@ KiCad 10.0.4 render piksel boyutu istekten farklı olabilir; `dimensions` PNG ba
 `render_sch` kopyada üç KiCad çağrısı yapar: XML netlist, görüntü SVG’leri ve kalibrasyonlu SVG’ler.
 Kalibrasyon kopyasındaki `${SHEETPATH}` metni her SVG’nin hangi sayfa örneği olduğunu, üç daire
 dönüşüm matrisini ölçer ([S8](spikes/S8.md)). Sayfa ağacı netlistten gelir; dosya adına güvenilmez.
+`readable_netlist` yalnız `kicad-cli` XML netlistini metne çevirir; rol veya bağlantı tahmini yapmaz. Pin adı
+KiCad'in `pinfunction` alanıdır (KiCad 10 pin numarasını ekleyebilir: `SCL_6`), adsız pin `~` yazılır. Değer,
+parça ve pin metni kontrol karakterlerinden arındırılır, 48 karaktere kısaltılır; bir alan sahte `NET` satırı
+üretemez. 12 pinden büyük netler adla istenmedikçe özetlenir; tek pinli `unconnected-` netleri atlanıp sayılır.
+Sınıra sığmayan netler kesilmez, bütün olarak dışarıda kalır ve `truncated=true` + uyarı döner.
+
 `scene_sch` netleri yalnız KiCad netlistinden alır: pin `(referans, pin)` ile, tel/etiket aynı sayfada
 dokunduğu netlist pinlerinden; pini olmayan küme yalnız tam adı netlistte varsa etiketten. Aksi `null`.
 Şematik işaretleri `space: "sch"`, `document` = sayfanın dosyası ve `sheet` = örnek yoludur; bağ
@@ -191,3 +223,26 @@ Başarılı ERC/DRC mevcut modelin kontrolüdür; [#1b niyet sınırı](limits.m
 CLI JSON çıktısı konsol kod sayfasından bağımsız ASCII Unicode kaçışları kullanır; JSON ayrıştırıldığında
 Türkçe ve diğer Unicode metinler kayıpsız geri gelir. Araç denetim kaydı doğrulanan hedefi kullanır;
 güvenlik kontrollerine ek bir proje hash taraması yapmaz.
+
+## Üretici profilleri (R2-B2)
+
+`check_bom_fields` session/document/revision ve optional profile ile kökteki aynı
+stem proje şematiğinin native export alanlarını salt okunur denetler. Eksikler,
+alan çatışmaları, exact pasif değerler ve aynı değer grubundaki yazım/metadata
+farkları raporlanır. MPN atanmaz; BOM/CPL/montaj/stok onayı yok. Bilinmeyen
+kategori ve belirsiz birim incomplete; [BOM kapsamı](spikes/R2-C1.md).
+
+`check_fab_dfm` session/document/revision, optional profile ve timeout_seconds
+(30–600, varsayılan300) ile ayrı pcb-dfm incelemesi yapar; start_job ile izlenebilir.
+Program yolu yalnız PCBAI_PCB_DFM_PYTHON veya PCBAI_PCB_DFM/PATH'ten bulunur.
+Python worker kalibrasyon yan raporu sağlar; CLI yolunda bu kanıt yoksa incomplete.
+Skor/exit0 yeterli değildir: zorunlu ölçüm, kimlik ve native katman/boyut/deliktotali
+karşılaştırılır. Maske kapsamı eksikse temiz geçmez. Salt okunur, üretim/montaj
+onayı değildir; [S13 ve açık kabul](spikes/S13.md).
+
+`check_fab_connections` session/document/revision ile gerçek native bakır ve IPC üretip
+bağımsız sınırlı Gerber geometrisini native şematikle kıyaslar. Pozitif doğrusal mm
+standart aperture/yüzey padları desteklenir; diğer geometri ve plated yollar incomplete
+kalır. Salt okunur, production_verified=false; tam RD-C2/paket kabulü açık.
+
+`fab_profiles({})` kaynaklı beş profili ve SHA kimliklerini okur. `check_fab_profile` session/document/revision/profile gerektirir; optional minimums yalnız tabanı yükseltir. Kurallar geçici kopyada native varsayılanlarla karşılaştırılır; sonuç production_verified=false. `export_fab` optional profile ile aynı kopyanın strict DRC kapısını uygular. Genel temiz sonuç üretim uygunluğu değildir; malzeme/proses, BOM/CPL/montaj ve Gerber bağlantısı ayrıca denetlenir.

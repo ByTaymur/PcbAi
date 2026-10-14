@@ -1,3 +1,4 @@
+import os
 import sys
 import tempfile
 import unittest
@@ -54,6 +55,7 @@ class EngineInventoryTests(unittest.TestCase):
         self.assertEqual(trace["code"], "engine_unavailable")
         self.assertFalse(trace["tested"])
 
+    @unittest.skipUnless(os.name == "nt", "WSL paths are resolved only on Windows")
     def test_wsl_version_query_keeps_isolated_timeout_arguments(self):
         observed = []
         def protocol(command, **options):

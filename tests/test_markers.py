@@ -185,6 +185,47 @@ class MarkerTests(unittest.TestCase):
         args.update(status="blocked", markers_revision=self.get()["markers_revision"])
         self.assertEqual(self.engine.call("update_marker_status", args)["error"]["code"], "untrusted_marker")
 
+    def manual(self, status, source="view", **extra):
+        args = dict(self.target, mode="preview", n=1, status=status,
+                    markers_revision=self.get()["markers_revision"], **extra)
+        preview = self.engine.call("set_marker_status", args, source=source)
+        if not preview["ok"]:
+            return preview
+        return self.engine.call("set_marker_status", dict(
+            self.target, mode="apply", candidate_id=preview["candidate_id"],
+            markers_revision=preview["markers_revision"]), source=source)
+
+    def test_manual_done_is_view_only_signed_and_reversible(self):
+        self.apply(self.preview())
+        self.assertEqual(self.manual("done", source="tool")["error"]["code"], "unknown_tool")
+        self.assertNotIn("set_marker_status", {d["name"] for d in self.engine.definitions})
+        done = self.manual("done")
+        self.assertTrue(done["ok"], done)
+        self.assertTrue(done["checkpoint"]["id"].startswith("cp-"))
+        marker = Engine([self.project], self.state).call("get_markers", {"session": self.session.id})["markers"][0]
+        self.assertEqual((marker["status"], marker["closed_by"], marker["trusted"]), ("done", "user", True))
+        self.assertEqual(marker["reason"], "Kullanıcı elle işaretledi")
+        self.assertNotIn("evidence_id", marker)
+        reopened = self.manual("open")
+        self.assertTrue(reopened["ok"], reopened)
+        marker = self.get()["markers"][0]
+        self.assertEqual(marker["status"], "open")
+        for key in ("closed_by", "reason", "evidence_id"):
+            self.assertNotIn(key, marker)
+        self.assertEqual(self.manual("blocked")["error"]["code"], "invalid_arguments")
+        agent = dict(self.target, mode="preview", n=1, status="done", reason="did it",
+                     markers_revision=self.get()["markers_revision"])
+        self.assertEqual(self.engine.call("update_marker_status", agent)["error"]["code"], "invalid_evidence")
+
+    def test_manual_status_rejects_stale_and_untrusted_markers(self):
+        self.apply(self.preview())
+        stale = dict(self.target, mode="preview", n=1, status="done", markers_revision="0" * 64)
+        self.assertEqual(self.engine.call("set_marker_status", stale, source="view")["error"]["code"], "stale_markers")
+        raw = json.loads(self.file.read_bytes())
+        raw["markers"][0]["note"] = "tampered"
+        self.file.write_text(json.dumps(raw))
+        self.assertEqual(self.manual("done")["error"]["code"], "untrusted_marker")
+
     def test_candidate_cannot_cross_marker_action_or_change_apply_parameters(self):
         preview = self.preview()
         args = dict(

@@ -21,9 +21,9 @@ from pcbai.core.contract import PcbAiError
 SCHEMA = json.loads(files("pcbai.verify").joinpath("finding.schema.json").read_text(encoding="utf-8"))
 Draft202012Validator.check_schema(SCHEMA)
 VALIDATOR = Draft202012Validator(SCHEMA)
-SOURCES = {"erc", "drc", "parity", "engine", "calibration", "readback"}
+SOURCES = {"erc", "drc", "parity", "engine", "calibration", "readback", "fab_profile", "fab", "bom"}
 EVIDENCE_SOURCES = dict(erc="kicad", drc="kicad", parity="kicad", engine="geometry",
-                        calibration="topology", readback="topology")
+                        calibration="topology", readback="topology", fab_profile="kicad", fab="geometry", bom="calculation")
 
 
 def canonical(value):
@@ -95,7 +95,8 @@ def normalize_findings(findings, source=None, *, evidence_id=None):
         payload = canonical([origin, rule, raw.get("group"), sorted(signatures, key=canonical)])
         base = f"{origin}:{rule}:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
         row.update(finding_id=base, source=origin, rule_id=rule, severity=severity, excluded=excluded,
-                   confidence=raw.get("confidence", "deterministic") if origin == "engine" else "deterministic",
+                   confidence=raw.get("confidence", "heuristic" if origin == "fab" else "deterministic")
+                   if origin in {"engine", "fab"} else "deterministic",
                    evidence_source=EVIDENCE_SOURCES[origin] if origin in {"erc", "drc", "parity"}
                    else raw.get("evidence_source", EVIDENCE_SOURCES[origin]), items=items)
         if "description" in raw:

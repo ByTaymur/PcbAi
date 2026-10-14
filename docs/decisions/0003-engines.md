@@ -28,6 +28,6 @@ küçük fixture apply/restore ve beş demo × iki rota koşusu [S10](../spikes/
 Yeni DRC/eksik bağlantı/UUID retleri nedeniyle K5 ve anlamlı placement kalite kabulü açık;
 varsayılan motor veya kendi tavlamamızı iptal kararı verilmedi. K12 paket ayrımı korunur.
 
-Yerel kayıtlar: [native hata](../../.pcbai-state/s4-debug.json),
-[WSL kurulumu](../../.pcbai-state/wsl-elevated.txt), [motor kıyası](../../.pcbai-state/s4-current.json).
+Yerel kayıtlar: native hata (yerel kayıt `.pcbai-state/s4-debug.json`),
+WSL kurulumu (yerel kayıt `.pcbai-state/wsl-elevated.txt`), motor kıyası (yerel kayıt `.pcbai-state/s4-current.json`).
 Resmi CLI bayrakları: [Freerouting 2.5.0 CLI belgesi](https://github.com/freerouting/freerouting/blob/v2.5.0/docs/command_line_arguments.md).

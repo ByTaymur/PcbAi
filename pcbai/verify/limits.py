@@ -11,6 +11,7 @@ LIMITS = {
     "L-KH-SMD-CATEGORY": "Connect pads are not necessarily SMD parts",
     "L-NO-INTENT-CHECK": "DRC/parity do not compare design intent",
     "L-EXTERNAL-MODEL-CALIBRATION": "Uncalibrated external models cannot certify dependent detectors",
+    "L-FAB-CONNECTION-SUBSET": "Only calibrated positive linear surface artwork is supported; complex and plated paths are incomplete",
 }
 
 

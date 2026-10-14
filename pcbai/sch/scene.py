@@ -342,7 +342,9 @@ def parse_netlist(data):
     components = {}
     for comp in root.iter("comp"):
         path = comp.find("sheetpath")
+        source = comp.find("libsource")
         components[comp.get("ref")] = dict(value=(comp.findtext("value") or ""),
+                                           part=source.get("part") if source is not None else None,
                                            tstamps=path.get("tstamps") if path is not None else None,
                                            names=path.get("names") if path is not None else None)
     pins, members = {}, {}
@@ -352,7 +354,8 @@ def parse_netlist(data):
             key = (node.get("ref"), node.get("pin"))
             pins[key] = name
             members.setdefault(name, []).append(dict(reference=key[0], pin=key[1],
-                                                     sheet=components.get(key[0], {}).get("tstamps")))
+                                                     sheet=components.get(key[0], {}).get("tstamps"),
+                                                     function=node.get("pinfunction"), type=node.get("pintype")))
     if not pages:
         raise PcbAiError("invalid_report", "Netlist has no sheets")
     return dict(pages=pages, components=components, pins=pins, members=members)

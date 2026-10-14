@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "waivers": [
+    {
+      "finding_id": "erc:pin_not_connected:50f2962dc332",
+      "reason": "Fixture: geçici kabulün süresi bitti; bulgu yeniden etkin olmalı",
+      "owner": "fixture",
+      "created": "2026-10-13",
+      "expires": "2026-10-14"
+    }
+  ]
+}

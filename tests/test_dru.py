@@ -50,9 +50,14 @@ class DruTests(unittest.TestCase):
                 (evidence / 'dru-loading-probe.json').write_text(report, encoding='utf-8')
                 if 'pcbai loading probe' not in report:
                     self.skipTest('CLI did not demonstrate loading custom DRU rules (10mm probe absent); syntax acceptance unavailable')
-                version = run([cli, '--version'], timeout=10).stdout.strip()
-                if version == '10.0.4':
-                    self.skipTest('KiCad 10.0.4 loads valid DRU but returns success for malformed rules; rejection acceptance unavailable')
+                # KiCad 10.0.x drops a malformed file and exits 0; PcbAi's gate must reject it instead.
+                from pcbai.core.contract import PcbAiError
+                from pcbai.kicad.cli import rule_check
+                rules.write_text('(version 1)\n(rule "broken" (constraint clearance (min 0.2mm))', encoding='utf-8')
+                with self.assertRaises(PcbAiError) as raised:
+                    rule_check(root, board.name, 'drc')
+                self.assertEqual(raised.exception.code, 'custom_rules_invalid')
+                return
             self.assertNotEqual(broken.returncode, 0, broken.stdout + broken.stderr)
 
     def test_vsix_contains_all_declared_language_assets(self):

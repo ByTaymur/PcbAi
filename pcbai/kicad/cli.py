@@ -6,9 +6,11 @@ from pathlib import Path
 
 from pcbai.core.contract import PcbAiError
 from pcbai.external import find_kicad_cli, run
-from pcbai.kicad.files import project_files, revision, within
+from pcbai.kicad.dru import preflight, probe_rules
+from pcbai.kicad.files import digest, project_files, project_bytes, revision, within, WAIVER_FILE
 from pcbai.sexpr import Document
 from pcbai.verify.findings import normalize_findings
+from pcbai.verify.severities import ignored_rules
 
 
 @contextmanager
@@ -20,7 +22,10 @@ def snapshot(root, expected_revision=None):
         for source in project_files(root):
             dest = target / source.relative_to(root)
             dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, dest)
+            if source.name == WAIVER_FILE:
+                dest.write_bytes(project_bytes(source))
+            else:
+                shutil.copyfile(source, dest)
         if expected_revision is not None and revision(target) != expected_revision:
             raise PcbAiError("stale_revision", "Project changed while creating the snapshot; inspect again")
         # Reject external hierarchical sheets: avoid reading files outside registered roots.
@@ -44,12 +49,18 @@ def rule_check(root, document, kind, *, parity=False, override=None, expected_re
         source = within(copy, document)
         if override is not None:
             within(copy, override_document or document).write_bytes(override)
+        inputs = {p.relative_to(copy).as_posix(): digest(project_bytes(p)) for p in project_files(copy)}
+        custom = custom_rules_gate(cli, copy, source) if kind == "drc" else None
         report_file = copy / "pcbai-check.json"
         argv = [cli, "sch" if kind == "erc" else "pcb", kind, str(source), "--format", "json",
                 "--output", str(report_file), "--units", "mm", "--severity-all", "--exit-code-violations"]
         if kind == "drc" and parity:
             argv.append("--schematic-parity")
         process = run(argv, cwd=copy)
+        if custom and custom["rules"] and process.returncode == 3:
+            # KiCad builds that fail DRC on rules which do not compile (master, not 10.0.x) exit 3.
+            raise PcbAiError("custom_rules_invalid", "KiCad could not compile the custom DRC rules: "
+                             + (process.stderr or process.stdout)[-2000:])
         if process.returncode not in {0, 5} or not report_file.is_file():
             raise PcbAiError("check_failed", f"KiCad {kind.upper()} failed (exit {process.returncode}): "
                              + (process.stderr or process.stdout)[-2000:])
@@ -79,9 +90,62 @@ def rule_check(root, document, kind, *, parity=False, override=None, expected_re
             raise PcbAiError("invalid_report", "Unknown finding severity; check cannot be certified")
         if process.returncode == 5 and not findings:
             raise PcbAiError("invalid_report", "KiCad reported violations but its report contains no findings")
+        ignored = ignored_rules(copy, document, kind, report, parity=parity)
         return dict(errors=errors, warning_count=warnings, excluded_count=excluded,
-                    findings=normalize_findings(findings, kind), report=report,
-                    exit_code=process.returncode, clean=errors == 0 and warnings == 0 and excluded == 0)
+                    findings=normalize_findings(findings, kind), report=report, custom_rules=custom,
+                    ignored_rules=ignored, inputs_sha256=inputs, exit_code=process.returncode,
+                    clean=errors == 0 and warnings == 0 and excluded == 0 and not any(r["required"] for r in ignored))
+
+
+_PROBES = {}
+
+
+def custom_rules_gate(cli, copy, board):
+    """Fail closed when the board's .kicad_dru is malformed or KiCad did not load it (see pcbai.kicad.dru).
+
+    Returns {status, rules, sha256, probe}; status is not_applicable (no rules), loaded or unverified
+    (probe found no copper to fire on). Raises custom_rules_invalid / custom_rules_not_loaded.
+    """
+    rules_file = board.with_suffix(".kicad_dru")
+    if not rules_file.is_file():
+        return dict(status="not_applicable", rules=0, sha256=None, probe=None)
+    data = rules_file.read_bytes()
+    checked = preflight(data)
+    if checked["problems"]:
+        raise PcbAiError("custom_rules_invalid", "Custom DRC rules are malformed; KiCad 10 would drop them "
+                         "silently: " + "; ".join(checked["problems"][:10]), details=checked)
+    if not checked["rules"]:
+        return dict(status="not_applicable", rules=0, sha256=digest(data), probe=None)
+    key = (str(cli), digest(board.read_bytes()), digest(data))
+    if key not in _PROBES:
+        name, probed = probe_rules(data)
+        output = copy / "pcbai-rules-probe.json"
+        try:
+            rules_file.write_bytes(probed)
+            process = run([cli, "pcb", "drc", str(board), "--format", "json", "--output", str(output),
+                           "--units", "mm", "--severity-all"], cwd=copy)
+        finally:
+            rules_file.write_bytes(data)
+        if process.returncode == 3:
+            raise PcbAiError("custom_rules_invalid", "KiCad could not compile the custom DRC rules: "
+                             + (process.stderr or process.stdout)[-2000:])
+        if process.returncode not in {0, 5} or not output.is_file():
+            raise PcbAiError("check_failed", f"Custom rule probe DRC failed (exit {process.returncode})")
+        text = output.read_text(encoding="utf-8")
+        try:
+            fired = json.loads(text).get("violations") or []
+        except ValueError as exc:
+            raise PcbAiError("invalid_report", "Custom rule probe produced no valid JSON report") from exc
+        status = "loaded" if name in text else ("unverified" if not fired else "not_loaded")
+        if len(_PROBES) > 32:
+            _PROBES.clear()
+        _PROBES[key] = status
+    status = _PROBES[key]
+    if status == "not_loaded":
+        raise PcbAiError("custom_rules_not_loaded", "KiCad ignored the custom DRC rules file (a probe rule "
+                         "appended to it never fired); fix the rules before trusting DRC", details=checked)
+    return dict(status=status, rules=checked["rules"], sha256=digest(data), probe="probe_rule_fired"
+                if status == "loaded" else "no_copper_for_probe")
 
 
 def export_pdf(root, document, destination, expected_revision=None):

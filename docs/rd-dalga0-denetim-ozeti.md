@@ -1,6 +1,6 @@
 # RD dalga 0 — bağımsız denetim özeti
 
-13 Ekim 2026 · Denetlenen commit: `70ddc62` · Denetçi: Claude Opus 5.5.
+13 Ekim 2026 · Denetlenen commit: `70ddc62` · Bağımsız denetim.
 
 Bu belge, yerel `.pcbai-state/audit-rd-dalga0/claude-review.md` raporunun kısa,
 depoda erişilebilir özetidir. Denetçi kodu değiştirmedi; uygulayanın kanıtlarının
@@ -28,7 +28,7 @@ geliştirme günlükleri `.pcbai-state/` altında yereldir, Git dağıtımına g
 
 ## D1-0 kabulü
 
-13 Ekim 2026 · Denetlenen commit: `ef05261` · Denetçi: Claude Opus 5.5; kod değiştirilmedi.
+13 Ekim 2026 · Denetlenen commit: `ef05261` · Bağımsız denetim; kod değiştirilmedi.
 Kaynak: yerel `.pcbai-state/audit-rd-dalga0/d1-0-review.md`.
 
 - KiCad editörleri kapalıyken `.venv` ile **259 test, OK (256 geçti, 3 skip), 693,0 sn**, Python exit 0.

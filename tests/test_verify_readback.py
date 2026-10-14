@@ -185,6 +185,9 @@ class ReadbackTests(unittest.TestCase):
         self.assertFalse(output["ok"], output)
         self.assertTrue(output["changed"])
         self.assertEqual(output["verified"], "readback_mismatch")
+        restore = output["suggested_restore"]  # one contract for every readback path: {tool, arguments[, requires]}
+        self.assertLessEqual(set(restore), {"tool", "arguments", "requires"})
+        self.assertEqual(restore["arguments"]["mode"], "preview")
 
     def test_connect_sha_ok_but_extra_member_is_mismatch(self):
         from pcbai.sch.edit import endpoint, plan_labels

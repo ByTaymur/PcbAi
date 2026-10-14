@@ -1,8 +1,11 @@
 import io
 import os
 import json
+import socket
 import unittest
+from unittest.mock import patch
 
+from mcp_server import pcbai_mcp
 from mcp_server.pcbai_mcp import META, handle, serve
 
 
@@ -13,7 +16,54 @@ class FakeClient:
         return {"ok": payload["name"] != "unknown", "changed": False}
 
 
+class SlowEngineClient:
+    """A 200 s engine preview: every single HTTP request returns quickly, the job finishes after `polls`."""
+    def __init__(self, polls):
+        self.polls, self.calls = polls, []
+
+    def request(self, method, path, payload=None):
+        name = payload["name"]
+        self.calls.append(name)
+        if name == "start_job":
+            return {"ok": True, "job": {"job_id": "job-1", "status": "queued"}}
+        if name == "job_status":
+            self.polls -= 1
+            if self.polls > 0:
+                return {"ok": True, "job": {"job_id": "job-1", "status": "running"}}
+            return {"ok": True, "job": {"job_id": "job-1", "status": "completed",
+                                        "result": {"ok": True, "candidate_id": "c1", "changed": False}}}
+        raise socket.timeout("timed out")
+
+
+def tool_call(client, name, arguments):
+    return handle({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                   "params": {"name": name, "arguments": arguments}}, client)["result"]["structuredContent"]
+
+
 class MCPTests(unittest.TestCase):
+    def test_long_engine_preview_runs_as_polled_job(self):
+        client = SlowEngineClient(polls=3)
+        with patch.object(pcbai_mcp, "POLL_SECONDS", 0):
+            output = tool_call(client, "autoroute", {"session": "s", "document": "a.kicad_pcb", "revision": "r",
+                                                     "mode": "preview", "engine": "tracemaker"})
+        self.assertEqual(output["candidate_id"], "c1")
+        self.assertEqual(client.calls, ["start_job", "job_status", "job_status", "job_status"])
+
+    def test_unfinished_job_returns_job_id_instead_of_timeout(self):
+        client = SlowEngineClient(polls=10 ** 6)
+        with patch.object(pcbai_mcp, "POLL_SECONDS", 0), patch.dict(os.environ, {"PCBAI_MCP_JOB_WAIT": "0"}):
+            output = tool_call(client, "autoplace", {"session": "s", "document": "a.kicad_pcb", "revision": "r",
+                                                     "mode": "preview", "engine": "tracemaker"})
+        self.assertTrue(output["ok"])
+        self.assertEqual(output["status"], "running")
+        self.assertEqual(output["job"]["job_id"], "job-1")
+
+    def test_timed_out_apply_reports_unknown_change(self):
+        output = tool_call(SlowEngineClient(polls=1), "autoroute", {"mode": "apply", "candidate_id": "c1"})
+        self.assertFalse(output["ok"])
+        self.assertIsNone(output["changed"])
+        self.assertEqual(output["error"]["code"], "service_timeout")
+
     def test_initialize_and_modern_discovery(self):
         client = FakeClient()
         legacy = handle(

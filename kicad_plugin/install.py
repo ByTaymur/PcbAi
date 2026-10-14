@@ -19,7 +19,9 @@ from kicad_plugin.configure import assert_unlinked, configure
 
 HERE = Path(__file__).resolve().parent
 IDENTIFIER = "org.pcbai.kicad"
-FILES = ["plugin.json", "requirements.txt", "pcbai_kicad.py", "register.py", "check.py"]
+FILES = ["plugin.json", "requirements.txt", "pcbai_kicad.py", "register.py", "check.py", "assistant.py", "marker.py",
+         "assistant_core.py", "assistant_window.py",
+         "assistant_model.py"]
 
 
 def png(size, pixel):
@@ -44,10 +46,27 @@ def plus(u, v):
     return (0.44 <= u <= 0.56 and 0.24 <= v <= 0.76) or (0.44 <= v <= 0.56 and 0.24 <= u <= 0.76)
 
 
+def link(u, v):
+    """Two chain rings: register = connect the project to the service."""
+    def ring(cx, cy):
+        r = ((u - cx) ** 2 + (v - cy) ** 2) ** 0.5
+        return 0.12 <= r <= 0.2
+    return ring(0.38, 0.5) or ring(0.62, 0.5)
+
+
 def tick(u, v):
     first = 0.25 <= u <= 0.45 and abs(v - (0.52 + (u - 0.25))) < 0.075
     second = 0.42 <= u <= 0.78 and abs(v - (0.72 - (u - 0.42) * 1.2)) < 0.075
     return first or second
+
+
+def bubble(u, v):
+    box = 0.22 <= u <= 0.78 and 0.24 <= v <= 0.62 and not (0.30 <= u <= 0.70 and 0.32 <= v <= 0.54)
+    tail = 0.32 <= u <= 0.46 and 0.62 <= v <= 0.62 + (0.46 - u) * 1.4
+    return box or tail
+
+
+ICONS = [("register", (37, 99, 235), link), ("marker", (234, 88, 12), plus), ("check", (22, 163, 74), tick), ("assistant", (124, 58, 237), bubble)]
 
 
 def install(dest, location=None):
@@ -58,7 +77,7 @@ def install(dest, location=None):
     assert_unlinked(target)
     entries = {name: (HERE / name).read_bytes() for name in FILES}
     entries['LICENSE'] = (HERE.parent / 'LICENSE').read_bytes()
-    for name, color, mark in (("register", (37, 99, 235), plus), ("check", (22, 163, 74), tick)):
+    for name, color, mark in ICONS:
         for size in (24, 48):
             entries[f'icons/{name}-{size}.png'] = png(size, icon(color, mark))
     for name in [*entries, 'pcbai_location.json']:

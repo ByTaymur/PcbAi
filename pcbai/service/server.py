@@ -9,7 +9,9 @@ from pcbai import __version__
 from pcbai.config import state_directory, write_json
 from pcbai.core.contract import PcbAiError
 from pcbai.tools.engine import Engine
+from pcbai.service.handoff import Handoffs
 from pcbai.service.sessions import Sessions
+from pcbai.service.agent_prompt import PromptError, serve_prompt
 
 
 @contextmanager
@@ -45,6 +47,21 @@ class Server(ThreadingHTTPServer):
 
 
 def handler(engine, token, instance):
+    handoffs = Handoffs(engine.state)
+
+    def handoff_call(path, payload):
+        """KiCad → VS Code handoff (AJ-5); internal endpoints, not MCP tools."""
+        if path == "/handoff/create":
+            if not isinstance(payload.get("session"), str):
+                raise PcbAiError("invalid_arguments", "session gerekli")
+            session = engine.sessions.get(payload["session"])
+            return dict(ok=True, id=handoffs.create(session, payload.get("prompt")))
+        if path == "/handoff/take":
+            return dict(ok=True, **handoffs.take(payload.get("id")))
+        if path == "/handoff/report":
+            return handoffs.report(payload.get("id"), payload.get("outcome"), payload.get("message", ""))
+        return dict(ok=True, **handoffs.status(payload.get("id")))
+
     class Handler(BaseHTTPRequestHandler):
         def setup(self):
             super().setup()
@@ -62,6 +79,17 @@ def handler(engine, token, instance):
             self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(data)
+
+        def body(self):
+            if self.headers.get("Transfer-Encoding"):
+                raise ValueError("Transfer-Encoding is unsupported")
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= 1024 * 1024:
+                raise ValueError("Invalid body length")
+            raw = self.rfile.read(length)
+            if len(raw) != length:
+                raise ValueError("Incomplete request")
+            return json.loads(raw)
 
         def authorized(self):
             provided = self.headers.get("Authorization", "")
@@ -83,6 +111,12 @@ def handler(engine, token, instance):
                                      for s in engine.sessions.entries.values())))
             elif self.path == "/tools":
                 self.reply(200, {"tools": engine.definitions})
+            elif self.path == "/events" or self.path.startswith("/events?since="):
+                since = self.path.partition("=")[2]
+                if since and not since.isdigit():
+                    self.reply(400, {"error": "since must be an event sequence number"})
+                    return
+                self.reply(200, {"events": engine.recent_events(int(since) if since else None)})
             elif self.path == "/version":
                 self.reply(200, {"version": __version__, "sessions": engine.sessions.describe()})
             else:
@@ -108,7 +142,22 @@ def handler(engine, token, instance):
 
                 threading.Thread(target=stop_safely, daemon=True).start()
                 return
-            if self.path not in {"/call", "/view/call"}:
+            if self.path in {"/handoff/create", "/handoff/take", "/handoff/report", "/handoff/status"}:
+                try:
+                    payload = self.body()
+                    if not isinstance(payload, dict):
+                        raise ValueError("Expected an object")
+                except (ValueError, OSError) as exc:
+                    self.reply(400, {"error": str(exc)})
+                    return
+                try:
+                    self.reply(200, handoff_call(self.path, payload))
+                except PcbAiError as exc:
+                    self.reply(200, dict(ok=False, error=dict(code=exc.code, message=str(exc))))
+                except Exception:
+                    self.reply(500, {"error": "Internal service error"})
+                return
+            if self.path not in {"/call", "/view/call", "/agent/prompt"}:
                 self.reply(404, {"error": "Unknown endpoint"})
                 return
             try:
@@ -121,6 +170,18 @@ def handler(engine, token, instance):
                 if len(raw) != length:
                     raise ValueError("Incomplete request")
                 payload = json.loads(raw)
+                if self.path == "/agent/prompt":
+                    # Internal call for the extension and KiCad window; deliberately not an MCP tool.
+                    if not isinstance(payload, dict):
+                        raise ValueError("Expected an object")
+                    try:
+                        self.reply(200, dict(ok=True, prompt=serve_prompt(engine, payload)))
+                    except (PromptError, PcbAiError) as exc:
+                        self.reply(200, dict(ok=False, error=dict(code=getattr(exc, "code", "invalid_request"),
+                                                                  message=str(exc))))
+                    except Exception:
+                        self.reply(500, {"error": "Internal service error"})
+                    return
                 if not isinstance(payload, dict) or set(payload) != {"name", "arguments"}:
                     raise ValueError("Expected name and arguments")
                 if not isinstance(payload["name"], str) or not isinstance(payload["arguments"], dict):
@@ -130,7 +191,8 @@ def handler(engine, token, instance):
                 return
             try:
                 self.reply(200, engine.call(payload["name"], payload["arguments"],
-                                           source="view" if self.path == "/view/call" else "tool"))
+                                           source="view" if self.path == "/view/call" else "tool",
+                                           client=self.headers.get("X-PcbAi-Client", "")[:80]))
             except Exception:
                 self.reply(500, {"error": "Internal service error"})
 

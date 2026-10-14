@@ -1,0 +1,330 @@
+{
+ "note": "Generated from pcbai.tools.engine definitions; tests/test_mcp_setup.py keeps it in sync.",
+ "tools": [
+  {
+   "name": "pcbai_status",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "doctor",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "route_engines",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "circuit_blocks",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "hand_calc",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "plan_circuit",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "spice_block_test",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "search_parts",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "part_info",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "verify_part",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "discover_ipc",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "engine_preview",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "discard_candidate",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "live_board_summary",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "get_selection",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "project_summary",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "list_symbols",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "list_footprints",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "list_nets",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "net_info",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "scene_pcb",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "render_pcb",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "hit_test",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "simulate",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "model_coverage",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "fab_profiles",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "check_fab_connections",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "check_bom_fields",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "check_fab_dfm",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "check_fab_profile",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "render_3d",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "render_sch",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "scene_sch",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "readable_netlist",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "hit_test_sch",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "get_markers",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "update_marker_status",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "check",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "get_waivers",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "set_waiver",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "delete_waiver",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "restore_waivers",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "erc",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "drc",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "schematic_pdf",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "render_board",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "board_stats",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "export_fab",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "start_job",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "job_status",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "set_value",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "add_block",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "add_symbol",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "replace_part",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "add_label",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "connect",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "autoroute",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "autoplace",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "move_footprint",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "set_track_width",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "add_zone",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "set_netclass",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "checkpoint",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  },
+  {
+   "name": "design_history",
+   "readOnlyHint": true,
+   "destructiveHint": false
+  },
+  {
+   "name": "restore_checkpoint",
+   "readOnlyHint": false,
+   "destructiveHint": true
+  }
+ ]
+}

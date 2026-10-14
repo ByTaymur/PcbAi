@@ -126,13 +126,14 @@ function drawMarkers() {
       svg('text',{x:p[0],y:p[1]+.3,'text-anchor':'middle','font-size':.85,fill:'#151a20'},m.n));
     const item=document.createElement('div');item.className='marker';item.dataset.n=m.n;
     const name=document.createElement('strong');name.textContent='#'+m.n;
-    const badge=document.createElement('span');badge.className='badge';badge.textContent=' · '+m.status+' · '+m.binding+(m.trusted?'':' · onaysız');
+    const badge=document.createElement('span');badge.className='badge';badge.textContent=' · '+m.status+(m.closed_by==='user'?' (elle)':'')+' · '+m.binding+(m.trusted?'':' · onaysız');
     const note=document.createElement('p');note.textContent=m.note;
     item.append(name,badge,note);
     if(m.reason || m.evidence_id) {const reason=document.createElement('p');reason.textContent=[m.reason,m.evidence_id].filter(Boolean).join(' · ');item.append(reason);}
     for(const [label,action] of [['Göster',()=>{select(null);const b=box(),p=toSvg(m.points_mm[0]);setBox([p[0]-b[2]/2,p[1]-b[3]/2,b[2],b[3]]);}],
       ['Düzenle',()=>{editingMarker=m;$('note').value=m.note;$('edit-preview').hidden=false;$('note').focus();
         $('instruction').textContent='#'+m.n+' notunu düzenleyip Notu önizle düğmesine basın.';}],
+      [m.status==='done'?'Yeniden aç':'Bitti',()=>send('markerStatus',{n:m.n,status:m.status==='done'?'open':'done'})],
       ['Sil',()=>send('markerPreview',{n:m.n,delete:true})],['Ajana sor',()=>send('ask',{n:m.n})]]) {
       const button=document.createElement('button');button.textContent=label;button.addEventListener('click',action);item.append(button);
     }

@@ -12,7 +12,7 @@ from xml.sax.saxutils import escape
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-INCLUDE = ["package.json", "extension.js", "board_view.js", "sch_view.js", "view3d.js", "sidebar_view.js", "engine_view.js", "part_assist.js", "README.md"]
+INCLUDE = ["package.json", "extension.js", "board_view.js", "sch_view.js", "view3d.js", "sidebar_view.js", "agents.js", "agent_prompt.js", "engine_view.js", "part_assist.js", "mcp_setup.js", "handoff.js", "mcp_tools.json", "README.md"]
 
 CONTENT_TYPES = """<?xml version="1.0" encoding="utf-8"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">

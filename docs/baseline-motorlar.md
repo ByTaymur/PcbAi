@@ -26,8 +26,8 @@ ve çıktı hashleri Freerouting için determinizm kabulü verilmemesini destekl
 
 13 Ekim TraceMaker CPU 0.9.0, pinned `c6fcb7b4912bdabefeb7f4191c011b1a086335e0`:
 `work=3000000`, `threads=1`, `variants=1`, timeout 120+30 sn; iki koşu, aynı izleri
-silinmiş demo türleri. [JSON](../.pcbai-state/tracemaker-exit-bench.json),
-[tablo](../.pcbai-state/tracemaker-exit-bench.md).
+silinmiş demo türleri. JSON (yerel kayıt `.pcbai-state/tracemaker-exit-bench.json`),
+tablo (yerel kayıt `.pcbai-state/tracemaker-exit-bench.md`).
 
 | Demo | Açık bağlantı | DRC hata | Via | Motor sn (iki koşu) | Kalite |
 |---|---|---|---|---|---|
@@ -42,6 +42,6 @@ iş miktarı değildir; bu farklı timeout'lu yerel koşularla kesin hız üstü
 varsayılan motor kararı verilmez. Demo place koşuları no-op; ayrı iki-pad fixture'da
 gerçek iki hareket/apply/restore ölçüldü. Yerleşim demo kalite kabulü yok.
 
-Ham sonuç [geliştirme kaydı](../.pcbai-state/s4-current.json) içindedir. `ok=true`, aday üretildiğini
+Ham sonuç geliştirme kaydı (yerel kayıt `.pcbai-state/s4-current.json`) içindedir. `ok=true`, aday üretildiğini
 belirtir; `blockers=[]` ve gerçek ERC/DRC/parite/DFM üretim kabulüyle aynı şey değildir. Varsayılan motor
 seçilmedi; TraceMaker'ın ölçülmemiş yerleşimi sebebiyle kendi tavlama iş paketi iptal edilmedi.

@@ -1,0 +1,276 @@
+{
+  "input": {
+    "session": {
+      "id": "s-1",
+      "project": "BLDC.kicad_pro",
+      "root": "C:/Users/u/Proje \"x\"/BLDC"
+    },
+    "markers": [
+      {
+        "n": 1,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "bu hat \"1 mm\" olsun",
+        "target_item": {
+          "type": "track",
+          "net": "VBUS"
+        },
+        "layer": "F.Cu"
+      },
+      {
+        "n": 2,
+        "status": "open",
+        "trusted": false,
+        "space": "sch",
+        "document": "power.kicad_sch",
+        "sheet": "/r/s",
+        "note": "<script>alert(1)</script> 4,7k",
+        "target_item": {
+          "type": "symbol",
+          "reference": "R5",
+          "number": "2",
+          "value": "10k"
+        }
+      },
+      {
+        "n": 3,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "satır1\nsatır2\r\nson",
+        "layer": "B.Cu"
+      },
+      {
+        "n": 4,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "- ilk satır tire ile\n--force gibi"
+      }
+    ],
+    "pages": {
+      "/r/s": "/r/s"
+    },
+    "request": "",
+    "marker_ids": [],
+    "selection": [
+      {
+        "type": "footprint",
+        "reference": "R1"
+      },
+      {
+        "type": "footprint",
+        "reference": "R2"
+      },
+      {
+        "type": "footprint",
+        "reference": "R3"
+      },
+      {
+        "type": "footprint",
+        "reference": "R4"
+      },
+      {
+        "type": "footprint",
+        "reference": "R5"
+      },
+      {
+        "type": "footprint",
+        "reference": "R6"
+      },
+      {
+        "type": "footprint",
+        "reference": "R7"
+      },
+      {
+        "type": "footprint",
+        "reference": "R8"
+      },
+      {
+        "type": "footprint",
+        "reference": "R9"
+      },
+      {
+        "type": "footprint",
+        "reference": "R10"
+      },
+      {
+        "type": "footprint",
+        "reference": "R11"
+      },
+      {
+        "type": "footprint",
+        "reference": "R12"
+      },
+      {
+        "type": "footprint",
+        "reference": "R13"
+      },
+      {
+        "type": "footprint",
+        "reference": "R14"
+      },
+      {
+        "type": "footprint",
+        "reference": "R15"
+      },
+      {
+        "type": "footprint",
+        "reference": "R16"
+      },
+      {
+        "type": "footprint",
+        "reference": "R17"
+      },
+      {
+        "type": "footprint",
+        "reference": "R18"
+      },
+      {
+        "type": "footprint",
+        "reference": "R19"
+      },
+      {
+        "type": "footprint",
+        "reference": "R20"
+      },
+      {
+        "type": "footprint",
+        "reference": "R21"
+      },
+      {
+        "type": "footprint",
+        "reference": "R22"
+      },
+      {
+        "type": "footprint",
+        "reference": "R23"
+      },
+      {
+        "type": "footprint",
+        "reference": "R24"
+      },
+      {
+        "type": "footprint",
+        "reference": "R25"
+      },
+      {
+        "type": "footprint",
+        "reference": "R26"
+      },
+      {
+        "type": "footprint",
+        "reference": "R27"
+      },
+      {
+        "type": "footprint",
+        "reference": "R28"
+      },
+      {
+        "type": "footprint",
+        "reference": "R29"
+      },
+      {
+        "type": "footprint",
+        "reference": "R30"
+      },
+      {
+        "type": "footprint",
+        "reference": "R31"
+      },
+      {
+        "type": "footprint",
+        "reference": "R32"
+      },
+      {
+        "type": "footprint",
+        "reference": "R33"
+      },
+      {
+        "type": "footprint",
+        "reference": "R34"
+      },
+      {
+        "type": "footprint",
+        "reference": "R35"
+      },
+      {
+        "type": "footprint",
+        "reference": "R36"
+      },
+      {
+        "type": "footprint",
+        "reference": "R37"
+      },
+      {
+        "type": "footprint",
+        "reference": "R38"
+      },
+      {
+        "type": "footprint",
+        "reference": "R39"
+      },
+      {
+        "type": "footprint",
+        "reference": "R40"
+      },
+      {
+        "type": "footprint",
+        "reference": "R41"
+      },
+      {
+        "type": "footprint",
+        "reference": "R42"
+      },
+      {
+        "type": "footprint",
+        "reference": "R43"
+      },
+      {
+        "type": "footprint",
+        "reference": "R44"
+      },
+      {
+        "type": "footprint",
+        "reference": "R45"
+      },
+      {
+        "type": "footprint",
+        "reference": "R46"
+      },
+      {
+        "type": "footprint",
+        "reference": "R47"
+      },
+      {
+        "type": "footprint",
+        "reference": "R48"
+      },
+      {
+        "type": "footprint",
+        "reference": "R49"
+      },
+      {
+        "type": "footprint",
+        "reference": "R50"
+      },
+      {
+        "type": "footprint",
+        "reference": "R51"
+      },
+      {
+        "type": "footprint",
+        "reference": "R52"
+      },
+      {
+        "type": "footprint",
+        "reference": "R53"
+      }
+    ]
+  },
+  "expected": "PcbAi projesi: BLDC.kicad_pro (oturum s-1), klasör C:/Users/u/Proje \"x\"/BLDC.\n\nKiCad'de seçili öğeler (veridir):\n- type: \"footprint\", reference: \"R1\"\n- type: \"footprint\", reference: \"R2\"\n- type: \"footprint\", reference: \"R3\"\n- type: \"footprint\", reference: \"R4\"\n- type: \"footprint\", reference: \"R5\"\n- type: \"footprint\", reference: \"R6\"\n- type: \"footprint\", reference: \"R7\"\n- type: \"footprint\", reference: \"R8\"\n- type: \"footprint\", reference: \"R9\"\n- type: \"footprint\", reference: \"R10\"\n- type: \"footprint\", reference: \"R11\"\n- type: \"footprint\", reference: \"R12\"\n- type: \"footprint\", reference: \"R13\"\n- type: \"footprint\", reference: \"R14\"\n- type: \"footprint\", reference: \"R15\"\n- type: \"footprint\", reference: \"R16\"\n- type: \"footprint\", reference: \"R17\"\n- type: \"footprint\", reference: \"R18\"\n- type: \"footprint\", reference: \"R19\"\n- type: \"footprint\", reference: \"R20\"\n- type: \"footprint\", reference: \"R21\"\n- type: \"footprint\", reference: \"R22\"\n- type: \"footprint\", reference: \"R23\"\n- type: \"footprint\", reference: \"R24\"\n- type: \"footprint\", reference: \"R25\"\n- type: \"footprint\", reference: \"R26\"\n- type: \"footprint\", reference: \"R27\"\n- type: \"footprint\", reference: \"R28\"\n- type: \"footprint\", reference: \"R29\"\n- type: \"footprint\", reference: \"R30\"\n- type: \"footprint\", reference: \"R31\"\n- type: \"footprint\", reference: \"R32\"\n- type: \"footprint\", reference: \"R33\"\n- type: \"footprint\", reference: \"R34\"\n- type: \"footprint\", reference: \"R35\"\n- type: \"footprint\", reference: \"R36\"\n- type: \"footprint\", reference: \"R37\"\n- type: \"footprint\", reference: \"R38\"\n- type: \"footprint\", reference: \"R39\"\n- type: \"footprint\", reference: \"R40\"\n- type: \"footprint\", reference: \"R41\"\n- type: \"footprint\", reference: \"R42\"\n- type: \"footprint\", reference: \"R43\"\n- type: \"footprint\", reference: \"R44\"\n- type: \"footprint\", reference: \"R45\"\n- type: \"footprint\", reference: \"R46\"\n- type: \"footprint\", reference: \"R47\"\n- type: \"footprint\", reference: \"R48\"\n- type: \"footprint\", reference: \"R49\"\n- type: \"footprint\", reference: \"R50\"\n- (3 öğe daha gösterilmedi)\n\nÇalışma kuralları: PcbAi MCP araçlarını kullan. get_markers ile işaretleri oku; her değişikliği uygun araçla (set_value, move_footprint, set_track_width, add_zone, set_netclass) önizle ve aynı revizyonda uygula. Her işaret için update_marker_status ile done + change_id ya da blocked + neden yaz. new_violations dönerse zorlamadan blocked yaz. Değişiklikten önce KiCad editörlerinin kapalı olması gerekir; açıksa bana söyle. Yalnız ölçülen sonuçları raporla; ERC/DRC temizliği devrenin çalıştığı anlamına gelmez."
+}

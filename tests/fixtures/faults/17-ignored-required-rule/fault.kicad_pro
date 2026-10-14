@@ -1,0 +1,17 @@
+{
+  "board": {
+    "design_settings": {
+      "rules": {
+        "min_clearance": 0.2
+      },
+      "rule_severities": {
+        "clearance": "ignore"
+      }
+    }
+  },
+  "erc": {
+    "rule_severities": {
+      "pin_not_connected": "ignore"
+    }
+  }
+}

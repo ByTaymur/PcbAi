@@ -1,0 +1,8 @@
+<export version="E"><components>
+  <comp ref="R1"><value>10K</value><footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+    <libsource lib="Device" part="R"/><fields><field name="MPN">EXAMPLE-R10K</field><field name="Manufacturer">Synthetic</field><field name="Tolerance">1%</field></fields>
+  </comp>
+  <comp ref="R2"><value>10k</value><footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+    <libsource lib="Device" part="R"/><fields><field name="MPN">EXAMPLE-R10K</field><field name="Manufacturer">Synthetic</field><field name="Tolerance">1%</field></fields>
+  </comp>
+</components></export>

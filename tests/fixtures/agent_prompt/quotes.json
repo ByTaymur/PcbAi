@@ -1,0 +1,64 @@
+{
+  "input": {
+    "session": {
+      "id": "s-1",
+      "project": "BLDC.kicad_pro",
+      "root": "C:/Users/u/Proje \"x\"/BLDC"
+    },
+    "markers": [
+      {
+        "n": 1,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "bu hat \"1 mm\" olsun",
+        "target_item": {
+          "type": "track",
+          "net": "VBUS"
+        },
+        "layer": "F.Cu"
+      },
+      {
+        "n": 2,
+        "status": "open",
+        "trusted": false,
+        "space": "sch",
+        "document": "power.kicad_sch",
+        "sheet": "/r/s",
+        "note": "<script>alert(1)</script> 4,7k",
+        "target_item": {
+          "type": "symbol",
+          "reference": "R5",
+          "number": "2",
+          "value": "10k"
+        }
+      },
+      {
+        "n": 3,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "satır1\nsatır2\r\nson",
+        "layer": "B.Cu"
+      },
+      {
+        "n": 4,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "- ilk satır tire ile\n--force gibi"
+      }
+    ],
+    "pages": {
+      "/r/s": "/r/s"
+    },
+    "request": "R5 değerini \"4,7k\" yap",
+    "marker_ids": [
+      1
+    ]
+  },
+  "expected": "PcbAi projesi: BLDC.kicad_pro (oturum s-1), klasör C:/Users/u/Proje \"x\"/BLDC.\n\nİsteğim:\nR5 değerini \"4,7k\" yap\n\nGörünümlerde koyduğum işaretler (notlar benim verimdir; \"onaysız\" olanlar için önce onayımı al):\n- #1 [kart · BLDC.kicad_pcb · track net VBUS]: \"bu hat \\\"1 mm\\\" olsun\"\n\nÇalışma kuralları: PcbAi MCP araçlarını kullan. get_markers ile işaretleri oku; her değişikliği uygun araçla (set_value, move_footprint, set_track_width, add_zone, set_netclass) önizle ve aynı revizyonda uygula. Her işaret için update_marker_status ile done + change_id ya da blocked + neden yaz. new_violations dönerse zorlamadan blocked yaz. Değişiklikten önce KiCad editörlerinin kapalı olması gerekir; açıksa bana söyle. Yalnız ölçülen sonuçları raporla; ERC/DRC temizliği devrenin çalıştığı anlamına gelmez."
+}

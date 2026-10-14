@@ -2,9 +2,7 @@ import copy
 import importlib.util
 import json
 import shutil
-import sys
 import tempfile
-import types
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -208,17 +206,14 @@ class FindingTests(unittest.TestCase):
             finally:
                 engine.jobs.close()
 
-    def test_kicad_plugin_describe_still_renders(self):
-        module_path = Path(__file__).resolve().parents[1] / "kicad_plugin/check.py"
-        stub = types.SimpleNamespace(**{name: lambda *args: None for name in
-                                      ("client_for", "current_project", "message", "run", "session_for")})
-        spec = importlib.util.spec_from_file_location("pcbai_test_plugin_check", module_path)
+    def test_kicad_plugin_check_lines_still_render(self):
+        module_path = Path(__file__).resolve().parents[1] / "kicad_plugin/assistant_core.py"
+        spec = importlib.util.spec_from_file_location("pcbai_test_plugin_core", module_path)
         module = importlib.util.module_from_spec(spec)
-        with patch.dict(sys.modules, pcbai_kicad=stub):
-            spec.loader.exec_module(module)
-        response = dict(ok=True, summary="DRC: 1 error", warnings=[], findings=[finding()])
-        original = module.describe(response)
-        normalized = module.describe(dict(response, findings=normalize_findings(response["findings"])))
+        spec.loader.exec_module(module)
+        response = dict(ok=True, verified="checks_findings", summary="DRC: 1 error", warnings=[], findings=[finding()])
+        original = module.check_lines(response)
+        normalized = module.check_lines(dict(response, findings=normalize_findings(response["findings"])))
         self.assertEqual(original, normalized)
         self.assertIn("Native description", normalized[-1])
         self.assertIn("(1.25, 2.5)", normalized[-1])

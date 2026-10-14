@@ -1,7 +1,7 @@
 # RD dalga 1 — bağımsız hedefli denetim özeti
 
 13 Ekim 2026. Uygulayan Codex; bağımsız salt okunur denetçi ayrı Codex ajanı.
-Claude plan çağrısı 900 saniyede sonuç üretmeden zaman aşımına uğradı; Claude planı,
+İkinci plan çağrısı 900 saniyede sonuç üretmeden zaman aşımına uğradı; ikinci plan,
 uygulaması veya denetimi yapılmış sayılmaz. AGENTS.md gereği kaynakta tek yazıcı vardı.
 Ham günlükler ve iki ajan defteri yerel `.pcbai-state/rd-wave1/` altında tutulur.
 

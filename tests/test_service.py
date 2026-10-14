@@ -63,6 +63,29 @@ class ServiceTests(unittest.TestCase):
         with self.opener.open(request, timeout=10) as response:
             return json.load(response)
 
+    def test_kicad_to_vscode_handoff_endpoints(self):
+        session = self.request("/call", payload={"name": "pcbai_status", "arguments": {}})["sessions"][0]["id"]
+        created = self.request("/handoff/create", payload={"session": session, "prompt": "R5 değerini oku"})
+        self.assertTrue(created["ok"])
+        handoff_id = created["id"]
+        taken = self.request("/handoff/take", payload={"id": handoff_id})
+        self.assertEqual(taken["prompt"], "R5 değerini oku")
+        self.assertEqual(self.request("/handoff/take", payload={"id": handoff_id})["error"]["code"], "already_taken")
+        self.assertTrue(self.request("/handoff/report", payload={"id": handoff_id, "outcome": "typed",
+                                                                  "message": "yazıldı"})["ok"])
+        status = self.request("/handoff/status", payload={"id": handoff_id})
+        self.assertEqual((status["outcome"], status["message"]), ("typed", "yazıldı"))
+        self.assertEqual(self.request("/handoff/create", payload={"session": {"x": 1}, "prompt": "p"})["error"]["code"],
+                         "invalid_arguments")
+        self.assertEqual(self.request("/handoff/create", payload={"session": "nope", "prompt": "p"})["error"]["code"],
+                         "unknown_session")
+        with self.assertRaises(HTTPError) as caught:
+            self.request("/handoff/take", token="wrong", payload={"id": handoff_id})
+        self.assertEqual(caught.exception.code, 401)
+        caught.exception.close()
+        tools = self.request("/tools")["tools"]
+        self.assertFalse(any("handoff" in tool["name"] for tool in tools))
+
     def test_auth_origin_and_host_rejection(self):
         for token, headers, code in [("wrong", {}, 401), (None, {"Origin": "https://evil.test"}, 403),
                                      (None, {"Host": "evil.test"}, 403)]:

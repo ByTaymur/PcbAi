@@ -5,7 +5,7 @@ Bağlı: [plan-referans-depolar.md](plan-referans-depolar.md) bölüm 3, 4-A, RD
 [S11](spikes/S11.md) · bağımsız dalga 0 [denetim özeti](rd-dalga0-denetim-ozeti.md)
 
 Uygulayan Codex; bu dalgada bağımsız salt okunur denetçi ayrı Codex ajanı (AGENTS.md).
-Claude plan denemesi zaman aşımına uğradı ve sonuç üretmedi; Claude denetimi yapılmış sayılmaz.
+İkinci plan denemesi zaman aşımına uğradı ve sonuç üretmedi; bağımsız denetim yapılmış sayılmaz.
 Bu belge **ne yapılacağını ve ne zaman bitmiş sayılacağını**
 söyler. Kod biçimi uygulayana aittir; sözleşme alanları, durum değerleri ve test adları bağlayıcıdır.
 
@@ -330,7 +330,7 @@ adaya `intent` ekler; [engine.py:859](../pcbai/tools/engine.py#L859) `_apply` ya
 - Kıyas yeniden koşulur (plan bölüm 7 "kapsam şişmesi" önlemi): R7 beş demo tablosunda gerileme yok.
 - status.md'ye dalga özeti, plan-referans-depolar.md'de A1–A6 ve I9 işaretleri.
 
-## 4. Claude denetiminde bakılacaklar (paket başına)
+## 4. Bağımsız denetimde bakılacaklar (paket başına)
 
 - Testleri `.venv` ile kendim koşarım; gerçek KiCad testlerini ayrıca.
 - A1: iki koşu kimlik eşitliğini farklı geçici dizinle de denerim (dizin yolu kimliğe sızıyor mu).

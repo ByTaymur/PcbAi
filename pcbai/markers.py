@@ -231,7 +231,7 @@ class Markers:
             would_change=raw != after,
         )
 
-    def preview_status(self, session, target, args):
+    def preview_status(self, session, target, args, manual=False):
         current, payload, raw = self.read(session)
         if current["markers_revision"] != args["markers_revision"]:
             raise PcbAiError("stale_markers", "Markers changed; preview again")
@@ -240,6 +240,11 @@ class Markers:
             raise PcbAiError("wrong_target", "Select the marker's explicit document")
         if not marker["trusted"]:
             raise PcbAiError("untrusted_marker", "Approve this marker in the UI before updating its status")
+        if manual:
+            # The user's own tick in the UI; agents still need change evidence through update_marker_status.
+            if args.get("status") not in {"open", "done"}:
+                raise PcbAiError("invalid_arguments", "Manual status is open or done")
+            args = dict(args, reason="Kullanıcı elle işaretledi")
         if "status" not in args or not args.get("reason", "").strip():
             raise PcbAiError("invalid_arguments", "Status preview requires status and a reason")
         saved = next(dict(m) for m in payload["markers"] if m["n"] == args["n"])
@@ -248,7 +253,12 @@ class Markers:
             status=args["status"], reason=args["reason"], updated=datetime.now(timezone.utc).isoformat()
         )
         saved.pop("evidence_id", None)
-        if args["status"] == "done":
+        saved.pop("closed_by", None)
+        if manual and args["status"] == "open":
+            saved.pop("reason")
+        elif manual:
+            saved["closed_by"] = "user"
+        elif args["status"] == "done":
             evidence_id = args.get("evidence_id", "")
             if (
                 len(evidence_id) != 35

@@ -1,0 +1,64 @@
+{
+  "input": {
+    "session": {
+      "id": "s-1",
+      "project": "BLDC.kicad_pro",
+      "root": "C:/Users/u/Proje \"x\"/BLDC"
+    },
+    "markers": [
+      {
+        "n": 1,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "bu hat \"1 mm\" olsun",
+        "target_item": {
+          "type": "track",
+          "net": "VBUS"
+        },
+        "layer": "F.Cu"
+      },
+      {
+        "n": 2,
+        "status": "open",
+        "trusted": false,
+        "space": "sch",
+        "document": "power.kicad_sch",
+        "sheet": "/r/s",
+        "note": "<script>alert(1)</script> 4,7k",
+        "target_item": {
+          "type": "symbol",
+          "reference": "R5",
+          "number": "2",
+          "value": "10k"
+        }
+      },
+      {
+        "n": 3,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "satır1\nsatır2\r\nson",
+        "layer": "B.Cu"
+      },
+      {
+        "n": 4,
+        "status": "open",
+        "trusted": true,
+        "space": "pcb",
+        "document": "BLDC.kicad_pcb",
+        "note": "- ilk satır tire ile\n--force gibi"
+      }
+    ],
+    "pages": {
+      "/r/s": "/r/s"
+    },
+    "request": "   ",
+    "marker_ids": [
+      99
+    ]
+  },
+  "error": "İstek yazın ya da en az bir işaret seçin"
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "jlcpcb-2l",
+  "qualifier": "üreticiyle doğrulayın",
+  "minimums": {
+    "min_clearance": {
+      "value_mm": 0.1,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    },
+    "min_track_width": {
+      "value_mm": 0.1,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    },
+    "min_through_hole_diameter": {
+      "value_mm": 0.2,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_preferred_via_drill_global_floor"
+    },
+    "min_via_annular_width": {
+      "value_mm": 0.075,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_preferred_via_diameter_margin_divided_by_two"
+    },
+    "min_copper_edge_clearance": {
+      "value_mm": 0.2,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    },
+    "min_text_height": {
+      "value_mm": 1,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    },
+    "min_text_thickness": {
+      "value_mm": 0.15,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    },
+    "min_silk_clearance": {
+      "value_mm": 0.15,
+      "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "retrieved": "2026-10-14",
+      "basis": "manufacturer_capability"
+    }
+  },
+  "scope": {
+    "copper_layers": [
+      2
+    ],
+    "process": "standard rigid FR4, 1 oz outer copper; other processes require a separate profile; routed edges only, V-cut excluded",
+    "other_processes_verified": false,
+    "source_url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+    "retrieved": "2026-10-14"
+  },
+  "assembly": {
+    "paste_required": true,
+    "bom_columns": [
+      "Comment",
+      "Designator",
+      "Footprint",
+      "LCSC Part #"
+    ],
+    "cpl_columns": [
+      "Designator",
+      "Mid X",
+      "Mid Y",
+      "Layer",
+      "Rotation"
+    ],
+    "format_source_url": "https://jlcpcb.com/help/article/pick-place-file-for-pcb-assembly",
+    "format_retrieved": "2026-10-14",
+    "format_basis": "manufacturer_headers",
+    "rotation": {
+      "lower_degrees": 0,
+      "upper_degrees": 360,
+      "upper_exclusive": true,
+      "source_url": "https://github.com/plocher/jBOM/blob/8e98cd3/src/jbom/config/profiles/jlc.jbom.yaml",
+      "retrieved": "2026-10-14",
+      "basis": "output_normalization_policy"
+    },
+    "bom_source_url": "https://jlcpcb.com/help/article/bill-of-materials-for-pcb-assembly"
+  },
+  "dfm_ruleset_id": "jlcpcb_2layer",
+  "production_verified": false,
+  "dfm_required_checks": [
+    "board_outline_continuity",
+    "min_trace_width",
+    "min_trace_spacing",
+    "min_drill_size",
+    "min_annular_ring",
+    "copper_to_edge_distance",
+    "drill_to_drill_spacing",
+    "solder_mask_web"
+  ],
+  "dfm_coverage_policy_source": "repo:docs/spikes/S13.md"
+}

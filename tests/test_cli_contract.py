@@ -26,7 +26,8 @@ class CLIContractTests(unittest.TestCase):
             return rule_check(self.project.parent, "Test.kicad_sch" if kind == "erc" else "Test.kicad_pcb", kind)
 
     def test_violation_exit_is_a_valid_finding_not_a_crash(self):
-        output = self.check_with_report({"sheets": [{"path": "/", "violations": [{"severity": "error"}]}]}, 5)
+        output = self.check_with_report({"ignored_checks": [],
+                                         "sheets": [{"path": "/", "violations": [{"severity": "error"}]}]}, 5)
         self.assertEqual(output["errors"], 1)
         self.assertFalse(output["clean"])
 
@@ -38,10 +39,16 @@ class CLIContractTests(unittest.TestCase):
     def test_all_drc_groups_and_exclusions_are_counted(self):
         output = self.check_with_report({"violations": [{"severity": "warning"}],
                                          "unconnected_items": [{"severity": "error"}],
-                                         "schematic_parity": [{"severity": "error", "excluded": True}]}, kind="drc")
+                                         "schematic_parity": [{"severity": "error", "excluded": True}],
+                                         "ignored_checks": []}, kind="drc")
         self.assertEqual(output["errors"], 1)
         self.assertEqual(output["warning_count"], 1)
         self.assertEqual(len(output["findings"]), 3)
+
+    def test_missing_native_rule_coverage_is_not_a_clean_report(self):
+        with self.assertRaises(PcbAiError) as caught:
+            self.check_with_report({"sheets": [{"path": "/", "violations": []}]})
+        self.assertEqual(caught.exception.code, "invalid_report")
 
     def test_snapshot_preserves_rules_and_project_local_library(self):
         library = self.project.parent / "pcbai/lib"

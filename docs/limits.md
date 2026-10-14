@@ -13,3 +13,4 @@ Kontrol atlamak temiz sonuç değildir. Kimlikler `pcbai.verify.limits` ile bire
 | L-KH-SMD-CATEGORY | Connect pad'ı SMD saymak | Pad türü ve parça sınıfı farklı | [S11](spikes/S11.md) | PCB sınıf sayımları |
 | L-NO-INTENT-CHECK | DRC/parite ile niyeti kabul etmek | Aynı yanlış model iki kontrolü de geçer | [#1b](../tests/fixtures/faults/01b-schematic-label-merge/README.md) | check/netlist_assert |
 | L-EXTERNAL-MODEL-CALIBRATION | Eşleşmeyen modelden kabul üretmek | Sayı ve üyelik ayrı kalibre edilmeli | [#9](../tests/fixtures/faults/09-wrong-net-members/README.md) | Kalibrasyona bağımlı dedektörler |
+| L-FAB-CONNECTION-SUBSET | Karmaşık Gerber ve katmanlar arası kaplamalı yolu kabul etmek | İlk okuyucu yalnız pozitif mm doğrusal standart aperture ve yüzey padlarını destekler | [R2-B3](spikes/R2-B3.md) | check_fab_connections / tam RD-C2 açık |

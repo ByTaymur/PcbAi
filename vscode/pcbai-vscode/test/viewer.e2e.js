@@ -171,6 +171,14 @@ async function main() {
         await page.locator('.marker[data-n="2"] button').filter({hasText:'Sil'}).click();
         await page.locator('#preview').waitFor({state:'visible'});await page.locator('#apply').click();
         await page.locator('.marker[data-n="2"]').waitFor({state:'detached'});
+        // IP-3: the user's own tick goes through the view-only tool and is reversible.
+        await page.locator('.marker[data-n="3"] button').filter({hasText:'Bitti'}).click();
+        await page.locator('.marker[data-n="3"] button').filter({hasText:'Yeniden aç'}).waitFor();
+        const ticked=(await request('get_markers',{session:session.id})).markers.find(m=>m.n===3);
+        assert.deepEqual([ticked.status,ticked.closed_by],['done','user']);
+        await page.locator('.marker[data-n="3"] button').filter({hasText:'Yeniden aç'}).click();
+        await page.locator('.marker[data-n="3"] button').filter({hasText:'Bitti'}).waitFor();
+        assert.equal((await request('get_markers',{session:session.id})).markers.find(m=>m.n===3).status,'open');
       }
       await page.locator('.marker[data-n="1"] button').filter({hasText:'Ajana sor'}).click();
       await page.waitForFunction(()=>document.querySelector('#error').textContent.includes('panoya'));

@@ -43,7 +43,9 @@ def main():
         return {"checks_ok": 0, "checks_findings": 1}.get(output.get("verified"), 2)
     if args.command == "doctor":
         from pcbai.doctor import inspect
-        print(json.dumps(inspect(), ensure_ascii=True, indent=2))
+        findings = inspect()
+        print(json.dumps(findings, ensure_ascii=True, indent=2))
+        return 1 if findings["requirements_unmet"] else 0
     elif args.command == "stop":
         from mcp_server.client import Client
         print(json.dumps(Client().shutdown(), ensure_ascii=True, indent=2))

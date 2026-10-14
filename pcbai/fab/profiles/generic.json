@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "generic",
+  "qualifier": "üreticiyle doğrulayın",
+  "minimums": {},
+  "scope": {
+    "copper_layers": null,
+    "process": "standard rigid FR4, 1 oz outer copper; other processes require a separate profile",
+    "other_processes_verified": false,
+    "source_url": "repo:docs/spikes/R2-B2.md",
+    "retrieved": "2026-10-14"
+  },
+  "assembly": {
+    "paste_required": true,
+    "bom_columns": [
+      "Designator",
+      "Quantity",
+      "Value",
+      "Package",
+      "Manufacturer Part Number"
+    ],
+    "cpl_columns": [
+      "Designator",
+      "Mid X",
+      "Mid Y",
+      "Layer",
+      "Rotation"
+    ],
+    "format_source_url": "repo:docs/spikes/R2-B2.md",
+    "format_retrieved": "2026-10-14",
+    "format_basis": "local_template_factory_confirmation_required",
+    "rotation": {
+      "lower_degrees": 0,
+      "upper_degrees": 360,
+      "upper_exclusive": true,
+      "source_url": "repo:docs/spikes/R2-B2.md",
+      "retrieved": "2026-10-14",
+      "basis": "output_normalization_policy"
+    },
+    "bom_source_url": "repo:docs/spikes/R2-B2.md"
+  },
+  "dfm_ruleset_id": "default",
+  "production_verified": false,
+  "dfm_required_checks": [
+    "board_outline_continuity",
+    "min_trace_width",
+    "min_trace_spacing",
+    "min_drill_size",
+    "min_annular_ring",
+    "copper_to_edge_distance",
+    "drill_to_drill_spacing",
+    "solder_mask_web"
+  ],
+  "dfm_coverage_policy_source": "repo:docs/spikes/S13.md"
+}

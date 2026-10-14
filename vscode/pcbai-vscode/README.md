@@ -27,7 +27,13 @@ bulguları konumlarında gösterir. Görünüm yalnız kaydedilmiş dosyayı oku
 İşaret notunu yazıp Nokta/Çizgi/Alan seçin ve kartı tıklayın; alan için **Alanı bitir** kullanın.
 Seçili UUID öğesi için **Seçili öğeye işaret koy** vardır. **Önizlemeyi uygula** kayıt öncesinde
 not ve koordinatları gösterir. İşaretler projedeki `pcbai/markers.json` dosyasında kalır; düzenleme
-ve silme de önizlemelidir. **Ajana sor** MCP isteğini panoya kopyalar.
+ve silme de önizlemelidir. **Ajana sor** isteği yan panelde seçili ajana gönderir.
+
+Yan paneldeki **YAPAY ZEKÂ / Ajan** listesi (ya da `PcbAi: Ajan seç`) istemin gideceği yeri belirler: Claude Code ve
+Codex mesaj kutusuna yazar (Codex'te metin panoda da durur), Claude Code/Codex (terminal) istemi doğrudan gönderir,
+Cline/Kilo/Roo panelini açıp panoya kopyalar, Copilot Chat sohbet kutusuna yazar, "Sadece panoya kopyala" yalnız kopyalar.
+Kurulu olmayan ajanlar seçilemez. Komut satırına sığmayan uzun istem proje içinde `.pcbai-state/prompts/` altına yazılır.
+Ajanların `pcbai` MCP kaydı şimdilik yalnız Claude Code için yazılır (`MCP'yi bu çalışma alanına ekle`); diğerleri AJ-2'dedir.
 
 Dosya/revizyon değişince panel kendiliğinden yenilenir; katman tercihleri korunur, eski DRC bulguları
 temizlenir. G2 şematik görüntüsü, G4 etkileşimli 3B ve G6 KiCad’de seçtirme henüz yoktur.

@@ -1,7 +1,7 @@
 # Plan — referans depolarla geliştirme (RD)
 
 Tarih: 13 Ekim 2026 · Durum: **plan v1; dalga 0 ölçüldü ve denetlendi, K15/K16-1/K20/K21 kabul ([0004](decisions/0004-referans-depolar.md)); dalga 1 D1-1…D1-7 uygulandı ([tarif](plan-rd-dalga1.md)); son ölçüm [status.md](status.md)** · Bağlı: [PLAN.md](../PLAN.md), [plan-eksikler.md](plan-eksikler.md),
-[status.md](status.md), [tools.md](tools.md)
+[status.md](status.md), [tools.md](tools.md), [ikinci dalga (R2)](plan-referans-depolar-2.md)
 
 Bu belge sekiz referans depodan (bölüm 1) ve KiCad ekosistemindeki başka projelerden (bölüm 1.1) PcbAi'ye
 **neyin, hangi yolla, hangi fazda** alınacağını ve her işin ne zaman "bitti" sayılacağını söyler. PLAN.md'nin yerine geçmez. PLAN'daki iş paketlerini (İP) besler, bazılarının içini
@@ -153,7 +153,7 @@ ve rapordur (İP-7.2).
 
 ## 4. İş paketleri
 
-Her paket ayrı dalda yürür (`ip/rd-a1-bulgu` gibi). Uygulayan Codex, bağımsız denetçi Claude'dur (AGENTS.md).
+Her paket ayrı dalda yürür (`ip/rd-a1-bulgu` gibi). Bir ajan uygular, ayrı bir ajan bağımsız denetler (AGENTS.md).
 Süreler tek uygulayan ajan içindir.
 
 ### A. Güven temeli (önce bunlar: "yeşil sonuç yalan söylemesin")
@@ -272,7 +272,9 @@ Süreler tek uygulayan ajan içindir.
   RD-I2) çapraz kontrol edilir. **Bitti:** Hata kataloğundaki 1 numaralı fixture yakalanıyor:
   "DRC sıfır ama iki net kısa". Eksik katman ve kaymış delik de yakalanıyor. **Süre:** 7 gün.
 - [ ] **RD-C3 JLC BOM/CPL ve iki BOM.** kicad-happy `translate_bom_pnp` (MIT) + PLAN 5.10 dönüş düzeltme tablosu.
-  BOM'da olmayan CPL satırları ayıklanır. **Satın alma BOM'u ve montaj BOM'u ayrıdır.** Hazırlık durumu
+  BOM/CPL referans farkları önce bulgu olarak raporlanır; yalnız profilin açık DNP/THT/elle montaj
+  kurallarıyla açıklanan satırlar gerekçesi kaydedilerek ayıklanır, açıklanamayan fark kapıyı engeller.
+  Ayrıntılı kapsam ve kabul: [U1–U4](plan-uretim-dogrulama.md). **Satın alma BOM'u ve montaj BOM'u ayrıdır.** Hazırlık durumu
   `manifest.json` içinde `bom_readiness` alanına yazılır. **Bitti:** P2 çıktısı JLC biçim denetiminden geçiyor.
   **PLAN bağı:** İP-5.11. **Süre:** 3 gün.
 - [ ] **RD-C4 3B girişim ve mekanik ön kontroller.** `render_3d` GLB'sinden bileşen gövdesi çakışması (modül altına

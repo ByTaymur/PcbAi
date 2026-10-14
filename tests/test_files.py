@@ -1,5 +1,6 @@
 import os
 import tempfile
+import time
 import unittest
 import subprocess
 from pathlib import Path
@@ -101,6 +102,38 @@ class FileTests(unittest.TestCase):
             with self.assertRaises(PcbAiError) as caught:
                 assert_closed(self.project.parent)
             self.assertEqual(caught.exception.code, "editor_open")
+
+    def test_revision_reuses_unchanged_digests_and_sees_changes(self):
+        model = self.project.parent / "big.step"
+        model.write_bytes(b"x" * 4096)
+        old = time.time() - 60
+        for path in self.project.parent.iterdir():
+            os.utime(path, (old, old))
+        first = revision(self.project.parent)
+        with patch("pcbai.kicad.files.project_bytes", side_effect=AssertionError("reread")):
+            self.assertEqual(revision(self.project.parent), first)
+        model.write_bytes(b"y" * 4096)  # same size, fresh mtime: rehashed, never cached while racy
+        second = revision(self.project.parent)
+        self.assertNotEqual(second, first)
+        self.assertEqual(revision(self.project.parent), second)
+
+    def test_project_mode_blocks_only_this_project(self):
+        listing = '"kicad.exe","123","Console","1","1 K"' if os.name == "nt" else "kicad\n"
+        exe = "C:/KiCad/kicad.exe" if os.name == "nt" else "kicad"
+        for args, blocked in [(f"{exe} D:/other/x.kicad_pro", False), (exe, False),
+                              (f"{exe} {self.project}", True), ("<unreadable>", True)]:
+            outputs = [CompletedProcess([], 0, listing, ""), CompletedProcess([], 0, args + "\n", "")]
+            with self.subTest(args=args), patch.dict(os.environ, PCBAI_EDITOR_CHECK="project"),                     patch("pcbai.kicad.files.run", side_effect=outputs):
+                if blocked:
+                    with self.assertRaises(PcbAiError) as caught:
+                        assert_closed(self.project.parent)
+                    self.assertEqual(caught.exception.code, "editor_open")
+                else:
+                    assert_closed(self.project.parent)
+        with patch.dict(os.environ, PCBAI_EDITOR_CHECK="project"), patch("pcbai.kicad.files.run", side_effect=[
+                CompletedProcess([], 0, listing, ""), CompletedProcess([], 1, "", "denied")]):
+            with self.assertRaises(PcbAiError):
+                assert_closed(self.project.parent)
 
     def test_crashed_writer_does_not_leave_permanent_lock(self):
         import sys

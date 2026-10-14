@@ -1,5 +1,6 @@
 import tempfile
 import threading
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -44,6 +45,35 @@ class JobTests(unittest.TestCase):
         self.assertEqual(status["result"]["error"]["code"], "timeout")
         with self.assertRaises(PcbAiError):
             jobs.submit("drc", TARGET, work)
+
+    def test_old_results_are_trimmed_to_summary(self):
+        jobs = Jobs(limit=1, full_results=2)
+        ids = []
+        for n in range(4):
+            done = threading.Event()
+            def work(n=n, done=done):
+                return {"ok": True, "summary": f"job {n}", "svg": "x" * 1000}
+            entry = jobs.submit("render_pcb", TARGET, work)
+            ids.append(entry["job_id"])
+            for _ in range(200):
+                if jobs.status(entry["job_id"])["status"] == "completed":
+                    break
+                time.sleep(0.01)
+        old, new = jobs.status(ids[0])["result"], jobs.status(ids[-1])["result"]
+        self.assertEqual(old, {"ok": True, "summary": "job 0", "result_trimmed": True})
+        self.assertIn("svg", new)
+
+    def test_shutdown_wait_is_bounded(self):
+        jobs = Jobs(limit=1)
+        entered, release = threading.Event(), threading.Event()
+        def stuck():
+            entered.set()
+            release.wait(5)
+            return {"ok": True}
+        job = jobs.submit("drc", TARGET, stuck)
+        self.assertTrue(entered.wait(2))
+        self.assertEqual(jobs.close(timeout=0.05), [job["job_id"]])
+        release.set()
 
     def test_exception_and_history_are_bounded(self):
         jobs = Jobs(retained=1)

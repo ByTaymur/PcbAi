@@ -1,7 +1,8 @@
 # PcbAi
 
 KiCad projesini yapay zekâ ajanlarına yerel MCP araçlarıyla açan Python çekirdeği.
-Mevcut çekirdek **0.1.14**, VS Code eklentisi **0.1.16**: kayıtlı şematik/kart ve salt okunur canlı PCB, gerçek ERC/DRC,
+Mevcut çekirdek **0.1.27** (tek kaynak `pcbai/__init__.py`), VS Code eklentisi kodu **0.1.26**; güncel kurulu sürüm
+ve kabul durumu [docs/status.md](docs/status.md) başındadır. Kayıtlı şematik/kart ve salt okunur canlı PCB, gerçek ERC/DRC,
 PDF/PNG, PCB ölçümleri, temel Gerber/delik ZIP, arka plan işleri, önizlemeli değer değişikliği,
 checkpoint ve geri yükleme; etkileşimli kart katmanları, seçim ve kalıcı PCB işaretleri. [Ürün planı](PLAN.md)
 ile [uygulama durumu](docs/status.md) ayrı tutulur.
@@ -32,7 +33,7 @@ fiziksel kabul sağlamaz; blok olgunluğu 0 kalır. [Girdiler ve sınırlar](doc
 
 ## Kurulum
 
-Python 3.11+ ve KiCad CLI gerekir. Bu Windows makinesinde `.venv` KiCad'in Python 3.11'iyle kuruldu.
+Python 3.11+ ve **KiCad 10.0.7 veya sonraki bir 10.0.x** gerekir ([indir](https://www.kicad.org/download/)); `python -m pcbai doctor` daha eski veya 11.x sürümde `requirements_unmet` yazar ve 1 ile çıkar, KiCad PCM paketi de 10.0.7 ister. Hiçbir 10.0.x sürümü bozuk `.kicad_dru` dosyasını reddetmez (sessizce atar, DRC 0 döner); PcbAi bu yüzden özel kurallı her DRC'de kural dosyasını denetler ve yüklendiğini ayrı bir yoklama koşusuyla kanıtlar. Bu Windows makinesinde `.venv` KiCad'in Python 3.11'iyle kuruldu.
 
 Service-state kayıtlı projelerden ayrı olmalıdır. `PCBAI_STATE_DIR` bir projenin altında/eşit veya
 projeyi kapsıyorsa başlangıç `invalid_state_directory` ile durur; varsayılan LOCALAPPDATA/PcbAi uygundur.
@@ -47,7 +48,7 @@ projeyi kapsıyorsa başlangıç `invalid_state_directory` ile durur; varsayıla
 
 `ipc` isteğe bağlı bağımlılıktır; canlı PCB keşfi ve seçimi salt okunurdur. API etkin olmalıdır;
 PcbAi KiCad ayarlarını değiştirmez. `discover_ipc` ile kanal, ardından açık oturum/belge seçilir.
-KiCad 10.0.4 dosya denetimleri çalışır. Plandaki ≥10.0.6 şartı gelecekteki IPC flip işlemleri içindir.
+Desteklenen asgari sürüm 10.0.7'dir (IPC `flip_items` ≥ 10.0.6 ister; 10.0.7 son kararlı hata düzeltme sürümü).
 
 ## İsteğe bağlı rota ve yerleşim motorları
 
@@ -110,7 +111,7 @@ MCP vekili Python 3.9+ stdlib kullanır; çekirdek servis Python 3.11+ ister.
 
 ```powershell
 .\.venv\Scripts\python.exe vscode\pcbai-vscode\build_vsix.py
-code --install-extension vscode\pcbai-vscode\dist\pcbai-vscode-0.1.16.vsix --force
+code --install-extension vscode\pcbai-vscode\dist\pcbai-vscode-0.1.26.vsix --force   # package.json sürümü
 .\.venv\Scripts\python.exe kicad_plugin\build_pcm.py
 .\.venv\Scripts\python.exe kicad_plugin\configure.py
 ```

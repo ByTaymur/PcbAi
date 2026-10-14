@@ -4,6 +4,61 @@ Tarih: 13 Ekim 2026 · Durum: **uygulama sürüyor** (çekirdek 0.1.22, VS Code 
 [status.md](status.md). Bu belge "şu an ne yok, hangi sırayla, nasıl ve ne zaman bitti sayılır" sorusunu yanıtlar.
 Uygulayan ajan her iş paketini bitirince [status.md](status.md)'ye ölçülen sonucu yazar ve buradaki satırı işaretler.
 
+## 14 Ekim — referans depolar, üçüncü dalga (R3)
+
+- [x] **Plan belgesi:** 24 depo, 9 yeni paket + mevcut paketlere ek kabul maddeleri
+  [plan-referans-depolar-3.md](plan-referans-depolar-3.md)'de.
+- [x] R3-A1 `readable_netlist` — dal `ip/r3-a1-netlist`; beş demoda pin kümesi KiCad netlistiyle birebir.
+- [ ] R3-0 kaynak incelemesi, R3-A2 … R3-E1 (sıra plan bölüm 5).
+
+## 14 Ekim — çok ajanlı entegrasyon ve KiCad içi arayüz (AJ)
+
+- [x] **Plan belgesi:** ajan seçici, tüm ajanlara MCP kaydı, tek istem kaynağı, KiCad asistan penceresi (wx),
+  KiCad → VS Code devri, ajan etkinliği ve yerleşik model [plan-ajan-arayuz.md](plan-ajan-arayuz.md)'de.
+- [x] AJ-1 VS Code ajan seçici (9 satır, teslim sonucu bildirimi; "Ajana sor" aynı yoldan) — VS Code 0.1.19;
+  gerçek Host'ta ajan başına kutuya yazma kabulü açık.
+- [x] AJ-2 MCP kaydı: Claude Code, Codex, Cline, Kilo, Roo, VS Code/Copilot; salt okunur liste `readOnlyHint`'ten —
+  VS Code 0.1.20; gerçek ajanlarda `pcbai_status` kabulü açık.
+- [x] AJ-3 servis tarafı tek istem kaynağı + KiCad seçimi girdisi — VS Code 0.1.21, `POST /agent/prompt`.
+- [ ] AJ-S1 (betik düzeyi ölçüldü, KiCad içi elle adım bekliyor; ön karar wx) KiCad eklenti venv'inde wx pencere denemesi.
+- [x] AJ-4 KiCad asistan penceresi (wx, ayrık süreç, tek örnek) ve AJ-5 KiCad → VS Code devri — VS Code 0.1.22;
+  gerçek KiCad 10'da pencere ve devir kabulü açık.
+- [x] AJ-7 etkinlik: servis olay kaydı + `GET /events`; KiCad penceresinde ve VS Code yan panelinde son 50 olay,
+  `blocked` ve değişiklik sonrası talimat — VS Code 0.1.24; gerçek Claude Code `set_value` → 2 sn kabulü açık.
+- [x] AJ-6 yerleşik model: KiCad penceresinde Ollama / LM Studio / Claude (Anthropic SDK) / OpenAI uyumlu; Planla /
+  Uygula, yazan araçlar onaylı, aynı hatalı çağrının 3. tekrarında durur — gerçek modelle kabul açık (bu makinede
+  Ollama, LM Studio, anahtar ve `anthropic` paketi yok).
+
+## 13 Ekim — yedi depo ile üretim ve davranış doğrulaması planı
+
+- [x] **Plan belgesi:** jBOM, KiCad-BOM-CPL-Plugin, pcb-dfm, KiCad-Astra, eSim,
+  Hauksbee ve pcb-inspector için ilgili işlevler, mevcut kod/RD/PLAN bağlantıları,
+  U0–U8 paketleri ve ölçülebilir kabul koşulları [plan-uretim-dogrulama.md](plan-uretim-dogrulama.md)'de.
+- [x] U0 ilk sabit kaynak/lisans/işlev envanteri ve bağımsız gerçek komut değerlendirmesi:
+  beş kaynak CLI, 16 komut; ignored clearance 69→0. [Ölçüm](spikes/U0.md).
+- [ ] eSim/Hauksbee runtime, tam transitif/model lisansı ve S13/S14 doğruluk kalibrasyonu.
+- [x] **R2-A1 uygulaması (0.1.23):** ignored zorunlu ERC/DRC kuralı `checks_incomplete`/CLI exit 2;
+  native/settings birleşimi, eksik native kapsam reddi, snapshot SHA, fixture #17.
+  Bağımsız hedefli denetim tamamlandı; son takım/CLI ölçümü [status.md](status.md)'de.
+- [x] **R2-A2 uygulaması (0.1.24):** gerekçe/sorumlu/tarih ile exact finding_id muafiyeti;
+  muaf/etkin/dolmuş/yetim bulgular görünür, incomplete kapısı korunur, preview/apply/checkpoint,
+  revizyon/snapshot SHA, sabit dosya ve boyut sınırı, oturumlar arası aday kilidi.
+  Son hedef takım 41 test / 40 geçti / 1 symlink yetkisi skip; [rapor](spikes/R2-A2.md).
+  UI ve JSON checkpoint geri yükleme aracı bu pakette yoktur.
+- [x] **R2-A3 (0.1.25):** native XML/SPICE model bağlama kapsamı, active/all oranları,
+  eksik model referansları ve min_coverage işçi öncesi kapısı; gerçek op-amp/pasif testleri,
+  bağımsız 35/35 hedef denetimi. [Rapor](spikes/R2-A3.md); fiziksel/pin/model kalibrasyonu değildir.
+- [x] **R2-B1 (0.1.26):** rol/hash manifestli tam ham Gerber/drill/IPC/POS/stats ZIP,
+  opsiyonel pasta; 5 gerçek demo/10 ZIP kaynak korunarak doğrulandı. [Rapor](spikes/R2-B1.md).
+  BOM/supplier CPL, DFM ve üretim yayın kapısı ayrı, production_verified=false.
+- [ ] U1–U4 BOM/CPL, bağımsız Gerber/Excellon DFM ve üretim yayın kapısı.
+- [ ] U5–U8 bağımsız layout/EMI ön denetimi, gerçek model SPICE, desteklenen STM32
+  sistem doğrulaması ve kontrollü finishing. Mevcut RD/PLAN işleriyle ortak paketlerdir;
+  ikinci kez tamamlanmış veya ayrı süre yükü sayılmaz.
+
+Bu teslim planlamadır; yedi harici araç kurulmadı ve entegrasyon kabulü verilmedi.
+Belge denetimi ve ölçüm sınırları [status.md](status.md)'de kaydedilir.
+
 ## EK ilk teslim — 13 Ekim
 
 - [x] EK-0 kaynak/uyumluluk incelemesi: [matris ve sınırlar](spikes/EK0.md).
@@ -21,11 +76,12 @@ Uygulayan ajan her iş paketini bitirince [status.md](status.md)'ye ölçülen s
 - [x] RD-B1/S11 uygulayan ölçümü: pinned MIT kicad-happy, beş R7 demosu, 20/20 ayrı süreç koşusu;
   iki tekrarda ID/çıktı eşitliği, native netlist üye kalibrasyonu, PCB sayımları ve 20 elle etiket.
   [Rapor](spikes/S11.md): 474 bulgu; 14 doğru/2 yanlış/4 belirsiz. Kaynaklar SHA-256 ile korundu.
-- [ ] RD-G2 **5/16 fixture**: #1 normal DRC temiz/parite net_conflict; #1b DRC/parite temiz ama niyetteki netler birleşik;
-  #9 ad→üye kalibrasyonu; #12 eksik zorunlu araç checks_incomplete/CLI exit 2; #13 readback_mismatch.
+- [ ] RD-G2 **7 fixture klasörü (ana katalogdan 5/16 + R2 #17, #24)**: #1 normal DRC temiz/parite net_conflict;
+  #1b DRC/parite temiz ama niyetteki netler birleşik; #9 ad→üye kalibrasyonu; #12 eksik zorunlu araç
+  checks_incomplete/CLI exit 2; #13 readback_mismatch; #17 yoksayılan zorunlu kural; #24 süresi dolmuş muafiyet.
   #1b, #1'in alt vakasıdır; niyet yakalayıcısı RD-C2'ye kadar yoktur.
   Ana katalogda #2–#8, #10–#11, #14–#16 (12 satır) açık.
-- [x] Bağımsız Claude denetimi: `.venv` ile 255 test OK (3 skip: symlink + 2 motor ortamı), gerçek KiCad 11/11,
+- [x] Bağımsız denetim: `.venv` ile 255 test OK (3 skip: symlink + 2 motor ortamı), gerçek KiCad 11/11,
   Ruff temiz; determinizm, 474 bulgu, pin çokluğu, 3 elle etiket ve 3 fixture gerçek KiCad ile yeniden üretildi.
   Çürütülen iddia yok; 2 belge eksiği (yayın JSON'u, ecc83 proje adı), 3 öneri.
   [Depoda erişilebilir denetim özeti](rd-dalga0-denetim-ozeti.md); ham rapor yerel `.pcbai-state/audit-rd-dalga0/claude-review.md`.
@@ -128,7 +184,7 @@ Uygulayan ajan her iş paketini bitirince [status.md](status.md)'ye ölçülen s
 - [x] R8 yazılımı: motor/bütçe seçimi, önce/sonra SVG ve ölçü/tanı paneli; Chromium UI testi,
   kaynakla eşleşen **VS Code 0.1.16 yüklendi**. Gerçek Extension Host motor/elle kabulü açık.
 - [x] R7 kıyas **betiği**: beş KiCad demosu × iki gerçek JAR koşusu;
-  [güncel yerel tablo](../.pcbai-state/s4-current.md), [S4](spikes/S4.md).
+  güncel yerel tablo (yerel kayıt `.pcbai-state/s4-current.md`), [S4](spikes/S4.md).
 - [x] R0/K13: WSL2/Ubuntu/pinned CPU derleme ve gerçek süreç sınırı ölçüldü.
 - [ ] R2/S10: anlamlı yerleşim ve temiz demo kalite kabulü açık; gerçek rota kıyası kaydedildi.
 - [ ] R1/R5/R6 motor kalite kabulü ve R7/K5 seçimi: ecc83/pic_programmer yeni DRC;
@@ -356,3 +412,35 @@ işse kurulu sürümde elle denenmiş · commit edilmiş.
 - [x] Dalga 1 denetim düzeltmeleri (0.1.22): cp1252 güvenli JSON, audit ek taramasının kaldırılması ve PCM metadata 0.1.14 başlığı. 76 hedefli test OK/100,030 sn; bağımsız CLI/audit kabulü, Ruff/lisans temiz. 337-test genel ölçümü 0.1.21 içindir. Çalışan servis takım bitince yeniden başlatılmalı; önizlemeler yeniden oluşturulur.
 
 - [x] Dal entegrasyonu (13 Ekim): tüm `ip/*` dalları main'e alındı, birleşen dallar silindi; 0.1.22 tam takım 342 OK/11 skip, Ruff temiz. G2-f gerçek yazım testi KiCad kapalı koşuda yeniden ölçülmeli. [Ölçüm](status.md).
+
+## Referans depolar, ikinci dalga (R2) — plan, uygulama başlamadı
+
+- [x] [R2 planı](plan-referans-depolar-2.md) hazırlandı: pcb-inspector, KiCad-Astra, pcb-dfm, hauksbee, jBOM,
+  KiCad-BOM-CPL-Plugin ve eSim kaynak okumasıyla; 55 gün, net zorunlu ek 38–41 gün, kararlar K22–K27.
+- [x] R2-A1 yoksayılan kural kapısı — 0.1.23'te uygulandı (yukarıdaki R2-A1 maddesi; fixture #17).
+
+- [x] R2-B2 (0.1.27): beş üretici profili, native minimum ölçümü, kopyada yalnız sıkılaştırılan kurallar ve strict export kapısı. Son uygulayan 36/36, bağımsız 42/42 OK; Ruff temiz. Üretici proses varsayımı/BOM-CPL dönüşümü/fiziksel kabul ayrı; [ölçüm](spikes/R2-B2.md).
+
+- [ ] R2-B3 ilk dilim (0.1.28): check_fab_connections ve gerçek #1 üçlü otorite bulgusu eklendi. Son hedef43/43 OK; Ruff/lisans temiz. Makro/region/arc/PTH/via ve tam RD-C2/paket kabulü açık; [ölçüm](spikes/R2-B3.md). Kesilen genel/CLI koşusu başarı değildir.
+
+- [ ] R2-B4/S13 deneysel bağdaştırıcı (0.1.29): ayrı süreç, sabit zorunlu kapsam,
+  bayt koruyan katman görünümü, native bakır/maske/boyut/drill kalibrasyonu.
+  Son uygulayan9/9 ve bağımsız9/9 OK; maske yokken upstream pass/null ve ölçülemeyen
+  halka negatifleri incomplete/bulgu olur. 20 etiket inconclusive, eğrisel sınır
+  ve tam ikinci denetçi kabulü açık; [S13](spikes/S13.md).
+  Son sabit geniş hedef65/65 OK/125.488sn, skip yok; Ruff/lisans/doctor0.
+- 0.1.28 birleşik son genel ölçüm tamamlandı:488 test/5 skip/1617.292sn, exit0;
+  önceki kesilen genel koşu bu sonuçla karıştırılmaz. Yeni0.1.29 kapsamı değildir.
+
+- [ ] R2-C1 ilk dilim (0.1.30): native BOM alanları/exact pasif değerler, #21 case
+  fixture ve gerçek native eksik alan sayımı. Son uygulayan10/10, bağımsız10/10 OK;
+  femto/native footprint karşı örnekleri düzeltildi. P2 referansı ve geniş
+  taksonomi açık; [kapsam](spikes/R2-C1.md). C2/C3/C4/B5 ayrıca geliştirilmeli.
+  Son sabit geniş hedef55/55 OK/43.382sn, skip yok; Ruff/lisans0.
+
+## İşaret paneli (IP) — 14 Ekim 2026
+
+- [x] IP-1 servis `set_marker_status` (yalnız görünüm)
+- [x] IP-2 yan panel Bitti/Sil/Bitenleri gizle/sil
+- [x] IP-3 kart/şematik düğmesi, bitmiş işaret istemde yok
+- [ ] IP-4 gerçek ortam elle kabulü

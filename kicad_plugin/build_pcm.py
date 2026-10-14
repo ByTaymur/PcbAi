@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pcbai import __version__
-from kicad_plugin.install import FILES, IDENTIFIER, icon, plus, png, tick
+from kicad_plugin.install import FILES, ICONS, IDENTIFIER, icon, plus, png
 
 ROOT = Path(__file__).resolve().parent.parent
 LICENSE = 'LGPL-2.1-or-later'
@@ -17,7 +17,7 @@ def metadata():
     return {
         '$schema': 'https://go.kicad.org/pcm/schemas/v2',
         'name': 'PcbAi',
-        'description': 'KiCad projelerini PcbAi servisine kaydet ve kaydedilmiş dosyalarda ERC/DRC çalıştır.',
+        'description': 'KiCad projelerini PcbAi servisine kaydet, ERC/DRC çalıştır ve PcbAi Asistan ile ajanlara istek gönder.',
         'description_full': 'KiCad 10 IPC eklentisi. PcbAi deposu ve Python ortamı ayrı kurulur. '
                             'Konum: PCBAI_ROOT veya kullanıcı PcbAi/location.json dosyası. '
                             'İlk kullanımda kicad-python kurulumu internet ister. '
@@ -27,7 +27,7 @@ def metadata():
         'author': {'name': 'Taymur', 'contact': {}},
         'license': LICENSE,
         'resources': {},
-        'versions': [{'version': __version__, 'status': 'development', 'kicad_version': '10.0', 'runtime': 'ipc'}],
+        'versions': [{'version': __version__, 'status': 'development', 'kicad_version': '10.0.7', 'runtime': 'ipc'}],
     }
 
 
@@ -39,7 +39,7 @@ def build(output=None):
                'plugins/LICENSE': (ROOT / 'LICENSE').read_bytes()}
     for name in FILES:
         entries['plugins/' + name] = (ROOT / 'kicad_plugin' / name).read_bytes()
-    for name, color, mark in [('register', (37, 99, 235), plus), ('check', (22, 163, 74), tick)]:
+    for name, color, mark in ICONS:
         for size in (24, 48):
             entries[f'plugins/icons/{name}-{size}.png'] = png(size, icon(color, mark))
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:

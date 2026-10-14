@@ -4,8 +4,8 @@
   "type": "object",
   "required": ["finding_id", "source", "rule_id", "severity", "confidence", "evidence_source", "excluded", "items"],
   "properties": {
-    "finding_id": {"type": "string", "pattern": "^(erc|drc|parity|engine|calibration|readback):.+:[0-9a-f]{12}(#[1-9][0-9]*)?$"},
-    "source": {"enum": ["erc", "drc", "parity", "engine", "calibration", "readback"]},
+    "finding_id": {"type": "string", "pattern": "^(erc|drc|parity|engine|calibration|readback|fab_profile|fab|bom):.+:[0-9a-f]{12}(#[1-9][0-9]*)?$"},
+    "source": {"enum": ["erc", "drc", "parity", "engine", "calibration", "readback", "fab_profile", "fab", "bom"]},
     "rule_id": {"type": "string", "minLength": 1},
     "severity": {"enum": ["error", "warning", "info"]},
     "confidence": {"enum": ["deterministic", "heuristic", "datasheet-backed"]},
@@ -33,11 +33,11 @@
   "additionalProperties": true,
   "allOf": [
     {
-      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity", "calibration", "readback"]}}},
+      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity", "calibration", "readback", "fab_profile", "bom"]}}},
       "then": {"properties": {"confidence": {"const": "deterministic"}}}
     },
     {
-      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity"]}}},
+      "if": {"properties": {"source": {"enum": ["erc", "drc", "parity", "fab_profile"]}}},
       "then": {"properties": {"evidence_source": {"const": "kicad"}, "severity": {"enum": ["error", "warning"]}}}
     }
   ]

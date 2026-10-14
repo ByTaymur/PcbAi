@@ -174,11 +174,12 @@ function drawMarkers() {
       svg('text', { x: p[0], y: p[1] + .45, 'text-anchor': 'middle', 'font-size': 1.3, fill: '#151a20' }, m.n));
     const item = el('div', undefined, 'marker'); item.dataset.n = m.n;
     const target = m.target_item ? ' · ' + [m.target_item.reference, m.target_item.number && 'pin ' + m.target_item.number, m.target_item.value].filter(Boolean).join(' ') : '';
-    item.append(el('strong', '#' + m.n), el('span', ' · ' + m.status + ' · ' + m.binding + target + (m.trusted ? '' : ' · onaysız'), 'badge'), el('p', m.note));
+    item.append(el('strong', '#' + m.n), el('span', ' · ' + m.status + (m.closed_by === 'user' ? ' (elle)' : '') + ' · ' + m.binding + target + (m.trusted ? '' : ' · onaysız'), 'badge'), el('p', m.note));
     if (m.reason || m.evidence_id) item.append(el('p', [m.reason, m.evidence_id].filter(Boolean).join(' · ')));
     for (const [label, action] of [
       ['Göster', () => { const b = box(), q = toSvg(m.points_mm[0]); setBox([q[0]-b[2]/2, q[1]-b[3]/2, b[2], b[3]]); }],
       ['Düzenle', () => { editingMarker = m; $('note').value = m.note; $('edit-preview').hidden = false; $('note').focus(); }],
+      [m.status === 'done' ? 'Yeniden aç' : 'Bitti', () => send('markerStatus', { n: m.n, status: m.status === 'done' ? 'open' : 'done' })],
       ['Sil', () => send('markerPreview', { n: m.n, delete: true })], ['Ajana sor', () => send('ask', { n: m.n })]]) {
       const button = el('button', label); button.addEventListener('click', action); item.append(button);
     }

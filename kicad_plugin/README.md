@@ -16,8 +16,47 @@ Dosyalar açık listeyle paketlenir; depo yolu, kurulum betikleri ve kullanıcı
    kaldırın; PCM ve geliştirme kopyası aynı anda bulunmamalı.
 2. KiCad → Eklenti ve İçerik Yöneticisi → **Dosyadan yükle…** → ZIP.
 3. Tercihler → Eklentiler → **KiCad API'yi etkinleştir**. PCB editörünü yeniden açın.
-4. **PcbAi'ye kaydet** ve **PcbAi ERC/DRC** düğmelerini kayıtlı demo kopyasında deneyin.
+4. **PcbAi'ye kaydet** (mavi halka), **PcbAi İşaret koy** (turuncu artı), **PcbAi ERC/DRC** ve **PcbAi Asistan**
+   düğmelerini kayıtlı demo kopyasında deneyin.
    Gerçek KiCad kabulü henüz ölçülmedi; bu adımlar kabul sonucu değildir.
+
+## İşaret koy (IM)
+
+Turuncu artı **PcbAi İşaret koy**, Asistan penceresini açar (açıksa öne getirir) ve imleci **İşaret notu** kutusuna
+koyar. Yer seçimi:
+
+- **PCB: KiCad seçimi.** Pencere KiCad seçimini okur ve "Hedef" satırında gösterir. Seçimde kimliği olan bir bileşen
+  varsa işaret ona bağlanır (bileşen taşınınca işaret de taşınır); yoksa ilk öğenin konumu nokta olur. Bileşen
+  kaydedilmiş kartta yoksa işaret nokta olarak konur ve durum satırı bunu söyler.
+- **Şematik: kaydedilmiş sayfa.** KiCad 10'da şematik düzenleyiciye eklenti düğmesi konamaz ve canlı şematik seçimi
+  okunamaz (`L-IPC-NO-LIVE-SCH`). Bu yüzden sayfa ve bileşen (referansa göre sıralı) pencereden seçilir; liste
+  kaydedilmiş dosyadan okunur ("sayfaları oku"). İşaret bileşenin UUID'sine ve sayfa örneğine bağlanır.
+
+Düğmeler: **İşaret koy**, **Koy ve ajana gönder** (yalnız yeni işaret işaretli olarak seçili ajana gider), listeden
+bir işaret seçilince notu kutuya gelir: **Notu kaydet**, **Bu işareti uygula** (yalnız o işaretle gönderir).
+Yazım VS Code paneliyle aynı yoldan gider (`/view/call` → `set_marker` önizle + uygula); işaretler
+`pcbai/markers.json`'da ortaktır ve VS Code görünümlerinde de görünür.
+
+## PcbAi Asistan penceresi (AJ-4)
+
+**PcbAi Asistan** düğmesi ayrı bir wx penceresi açar (KiCad 10 IPC'de yerleştirilebilir panel yok). Düğme
+pencereyi ayrık süreçte başlatıp hemen döner; ikinci tıklama yeni pencere açmaz, mevcut pencereyi öne getirir;
+KiCad kapanınca pencere de kapanır. Pencerede ajan seçimi (VS Code'daki ajan, Claude Code ve Codex terminali,
+pano), istek kutusu, KiCad seçimi (yaklaşık 0,7 sn'de bir okunur), açık işaretler, oluşan istemin önizlemesi,
+ERC/DRC (servisin `check` aracı) ve son 50 ajan olayı bulunur. İstem metni servisten gelir (`POST /agent/prompt`).
+"VS Code'daki ajan" satırı istemi URL'ye koymaz: servis tek kullanımlık bir devir kaydı tutar, VS Code eklentisi
+onu alıp panelde seçili ajana verir ve sonucu pencerenin durum satırına geri yazar (AJ-5). Terminal ajanları istemi
+doğrudan başlatır; bu yüzden önizleme varsayılan olarak açıktır. Ajan seçimi `%APPDATA%/PcbAi/assistant.json`'da
+tutulur; KiCad ayarları değişmez.
+
+**Yerleşik model (AJ-6).** "Yerleşik model — bu pencerede" satırı pencerede sohbet açar. Sağlayıcılar: Ollama
+(`/api/chat`, `num_ctx` 16384), LM Studio ve OpenAI uyumlu sunucular (`/chat/completions`), Claude (resmi
+`anthropic` SDK, varsayılan `claude-opus-5-5`, sunucu tarafı yedek model açık). SDK eklenti ortamında yoksa
+"Paketi kur" onaydan sonra `pip install anthropic` çalıştırır. API anahtarı yalnız ortam değişkeninden okunur
+(`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`); ayar dosyasına yalnız değişkenin adı yazılır. Araçlar pencerede değil
+PcbAi servisinde `builtin` istemci adıyla çalışır: **Planla** modunda yazan araçlar modele hiç sunulmaz;
+**Uygula** modunda önizleme serbest, `apply` ve diğer yazan çağrılar çözülmüş argümanlar ve önizleme özetiyle onay
+ister. Aynı hatalı çağrının 3. tekrarında tur durur. Yerel küçük modellere küçük araç kümesi verilir.
 
 Konum çözüm sırası: `PCBAI_ROOT` → `%APPDATA%/PcbAi/location.json` (`{"root": "mutlak yol"}`)
 → açıklayıcı hata. `configure.py` bu dış dosyayı yazar; KiCad ayarlarını değiştirmez. Açık ama

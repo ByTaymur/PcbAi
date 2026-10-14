@@ -51,6 +51,23 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(len(calls), 3)
         self.assertEqual([r["status"] for r in output["checks_run"]], ["failed", "ran", "ran"])
 
+    def test_parity_escalation_does_not_rewrite_child_coverage_evidence(self):
+        original = self.engine._call
+        def run(name, args, session):
+            if name == "check":
+                return original(name, args, session)
+            rows = [] if name != "drc" else [dict(entry("drc_rule:schematic_parity",
+                required=args.get("parity", False), status="skipped", reason="rule_ignored_in_project"),
+                rule="schematic_parity")]
+            return dict(ok=True, findings=[], checks_run=rows)
+        with patch.object(self.engine, "_call", side_effect=run):
+            output = self.engine.call("check", dict(session=self.session.id, scope="pcb"))
+        self.assertEqual(output["verified"], "checks_incomplete")
+        rules = [r for r in output["checks_run"] if r.get("rule") == "schematic_parity"]
+        self.assertEqual(len(rules), 1)
+        self.assertTrue(rules[0]["required"])
+        self.assertFalse(output["results"]["drc"]["checks_run"][0]["required"])
+
     def test_missing_pcb_is_skipped(self):
         self.project.with_suffix(".kicad_pcb").unlink()
         output = self.engine.call("check", dict(session=self.session.id, scope="pcb"))

@@ -2,7 +2,7 @@
   "name": "pcbai-vscode",
   "displayName": "PcbAi · KiCad",
   "description": "KiCad projeleri için PcbAi: kart ve şematik görünümü, işaretler, kart önizlemesi, ölçümler, ERC/DRC, şematik PDF, MCP kaydı.",
-  "version": "0.1.18",
+  "version": "0.1.30",
   "license": "LGPL-2.1-or-later",
   "publisher": "taymur",
   "engines": {
@@ -12,7 +12,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onUri"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -100,6 +101,16 @@
         "category": "PcbAi"
       },
       {
+        "command": "pcbai.chooseAgent",
+        "title": "Ajan seç (Claude Code, Codex, Cline, Kilo, Copilot…)",
+        "category": "PcbAi"
+      },
+      {
+        "command": "pcbai.connectAgents",
+        "title": "MCP'yi ajanlara bağla",
+        "category": "PcbAi"
+      },
+      {
         "command": "pcbai.addMcp",
         "title": "MCP'yi bu çalışma alanına ekle (.mcp.json)",
         "category": "PcbAi"
@@ -132,6 +143,9 @@
         }
       }
     },
+    "mcpServerDefinitionProviders": [
+      {"id": "pcbai", "label": "PcbAi"}
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -152,7 +166,7 @@
     }
   },
   "scripts": {
-    "test": "node test_extension.js && node test/sidebar.test.js && node test/dru.test.js && node test/part_assist.test.js",
+    "test": "node test_extension.js && node test/sidebar.test.js && node test/agents.test.js && node test/dru.test.js && node test/part_assist.test.js && node test/mcp_setup.test.js && node test/handoff.test.js && node test/agent_prompt.test.js",
     "test:viewer": "node test/viewer.e2e.js",
     "test:sch": "node test/sch.e2e.js",
     "test:3d": "node test/view3d.e2e.js",

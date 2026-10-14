@@ -50,7 +50,7 @@ function readInfo() {
 function request(info, method, urlPath, payload, timeout = 150000) {
   return new Promise((resolve, reject) => {
     const body = payload === undefined ? undefined : Buffer.from(JSON.stringify(payload), 'utf8');
-    const headers = { Authorization: 'Bearer ' + info.token };
+    const headers = { Authorization: 'Bearer ' + info.token, 'X-PcbAi-Client': 'vscode' };
     if (body) Object.assign(headers, { 'Content-Type': 'application/json', 'Content-Length': body.length });
     const req = http.request({ host: '127.0.0.1', port: info.port, path: urlPath, method, headers, timeout }, (res) => {
       const chunks = [];
@@ -180,6 +180,20 @@ async function call(name, args = {}) {
   const live = await health();
   if (!live) throw new Error('PcbAi servisi çalışmıyor');
   return request(live.info, 'POST', '/call', { name, arguments: args });
+}
+
+// Agent activity log (AJ-7): events newer than `since`; null when the service is not running.
+async function events(since) {
+  const live = await health();
+  if (!live) return null;
+  return (await request(live.info, 'GET', '/events' + (since == null ? '' : '?since=' + Number(since)), undefined, 5000)).events;
+}
+
+// Internal prompt composition (AJ-3); not an MCP tool. Older services answer 404 and the caller falls back.
+async function agentPrompt(args) {
+  const live = await health();
+  if (!live) return null;
+  return request(live.info, 'POST', '/agent/prompt', args, 15000);
 }
 
 async function backgroundJob(tool, session, document, options = {}) {
@@ -316,13 +330,8 @@ const commands = {
   async 'pcbai.view'() {
     const session = await pickSession();
     const document = await pickDocument(session, '.kicad_pcb');
-    const viewCall = async (name, args) => {
-      const live = await health();
-      if (!live) throw new Error('PcbAi servisi çalışmıyor');
-      return request(live.info, 'POST', '/view/call', { name, arguments: args });
-    };
     const view = require('./board_view').openView(extensionContext,
-      { stateDir: stateDir(), session, document, call, backgroundJob, viewCall });
+      { stateDir: stateDir(), session, document, call, backgroundJob, viewCall, agentPrompt });
     return view.whenLoaded;
   },
   async 'pcbai.view3d'() {
@@ -335,13 +344,8 @@ const commands = {
     const session = await pickSession();
     const document = session.project.replace(/\.kicad_pro$/, '.kicad_sch');
     if (!(session.documents || []).includes(document)) throw new Error('Projenin kök şematiği yok: ' + document);
-    const viewCall = async (name, args) => {
-      const live = await health();
-      if (!live) throw new Error('PcbAi servisi çalışmıyor');
-      return request(live.info, 'POST', '/view/call', { name, arguments: args });
-    };
     const view = require('./sch_view').openSchematic(extensionContext,
-      { stateDir: stateDir(), session, document, call, backgroundJob, viewCall });
+      { stateDir: stateDir(), session, document, call, backgroundJob, viewCall, agentPrompt });
     return view.whenLoaded;
   },
   async 'pcbai.start'() {
@@ -360,26 +364,24 @@ const commands = {
     for (const s of status.sessions || []) output.appendLine(`  ${s.id}  ${path.join(s.root, s.project)}  (${s.mode})`);
   },
   async 'pcbai.check'() {
+    // One verdict with KiCad and MCP: the aggregate check counts ignored required rules, coverage and waivers.
     const session = await pickSession();
     output.show(true);
     output.appendLine(`\n${session.project} — kaydedilmiş dosyalar denetleniyor (açık editördeki kaydedilmemiş değişiklikler görülmez)`);
-    const sch = rootDocument(session, '.kicad_sch');
-    const pcb = rootDocument(session, '.kicad_pcb');
-    const lines = [];
-    if (sch) {
-      output.appendLine(`ERC · ${sch}`);
-      const r = await call('erc', { session: session.id, document: sch });
-      printFindings(r);
-      lines.push(r.ok ? r.summary : 'ERC çalışmadı');
+    const r = await call('check', { session: session.id, scope: 'all' });
+    printFindings(Object.assign({}, r, { findings: r.active_findings || r.findings }));
+    for (const c of r.checks_run || []) {
+      if (c.status !== 'passed' || c.reason) output.appendLine(`  denetim ${c.check_id}: ${c.status}${c.reason ? ' (' + c.reason + ')' : ''}`);
     }
-    if (pcb) {
-      output.appendLine(`DRC · ${pcb}`);
-      const r = await call('drc', { session: session.id, document: pcb, parity: Boolean(sch) });
-      printFindings(r);
-      lines.push(r.ok ? r.summary : 'DRC çalışmadı');
+    if ((r.waived || []).length) output.appendLine(`  ${r.waived.length} bulgu muafiyetli; en yakın bitiş ${r.next_waiver_expiry}`);
+    for (const [key, label] of [['expired_waivers', 'süresi dolmuş muafiyet'], ['orphaned_waivers', 'yetim muafiyet'],
+      ['policy_exceeded_waivers', 'süre politikasını aşan muafiyet']]) {
+      for (const w of r[key] || []) output.appendLine(`  ! ${label}: ${w.finding_id}`);
     }
-    if (!lines.length) throw new Error('Projede şematik ya da kart dosyası yok');
-    vscode.window.showInformationMessage(lines.join(' · '));
+    if (!r.ok) throw new Error(r.summary || 'Denetim çalışmadı');
+    const text = `${r.verified}: ${r.summary}`;
+    if (r.verified === 'checks_incomplete') vscode.window.showWarningMessage('Denetim eksik — sonuç temiz sayılmaz. ' + text);
+    else vscode.window.showInformationMessage(text);
   },
   async 'pcbai.pdf'() {
     const session = await pickSession();
@@ -412,6 +414,17 @@ const commands = {
     output.appendLine(`\n${document} — kayıtlı kart ölçümleri (kanıt ${response.evidence_id})`);
     for (const measure of response.measurements) output.appendLine(`  ${measure.quantity}: ${measure.value} ${measure.unit}`);
   },
+  async 'pcbai.chooseAgent'() {
+    const agents = require('./agents');
+    agents.detect();
+    const selected = agents.current(extensionContext).id;
+    const items = agents.list().filter(a => a.available)
+      .map(a => ({ label: (a.id === selected ? '$(check) ' : '') + a.label, description: a.detail, id: a.id }));
+    const pick = await vscode.window.showQuickPick(items, { placeHolder: 'PcbAi istemleri hangi ajana gitsin?' });
+    if (!pick) return;
+    const agent = await agents.choose(extensionContext, pick.id);
+    vscode.window.showInformationMessage(`PcbAi ajanı: ${agent.label} — ${agent.detail}.`);
+  },
   async 'pcbai.addMcp'() {
     const folder = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0];
     if (!folder) throw new Error('Açık çalışma alanı yok');
@@ -434,7 +447,45 @@ const commands = {
     fs.writeFileSync(file, JSON.stringify(config, null, 2) + '\n', 'utf8');
     vscode.window.showInformationMessage(`PcbAi MCP kaydı yazıldı (${projects.length} proje). Claude Code'u yeniden başlatın.`);
   },
+  async 'pcbai.connectAgents'() {
+    const setup = require('./mcp_setup');
+    const { root, python } = settings();
+    const live = await health();
+    let definitions = setup.bundledTools();
+    if (live) { try { definitions = (await request(live.info, 'GET', '/tools', undefined, 5000)).tools || definitions; } catch (_) { /* bundled copy */ } }
+    const ctx = mcpContext();
+    const installed = new Set(vscode.extensions.all.map(e => e.id.toLowerCase()));
+    const projects = ctx.workspace ? (await workspaceProjects()).map((p) => path.resolve(p)) : [];
+    const list = setup.targets({ ...ctx, installed, python, root, projects, readOnly: setup.readOnlyTools(definitions),
+      claudeCli: require('./agents').findCli('claude') });
+    if (!list.length) throw new Error('Bağlanacak ajan bulunamadı');
+    const picks = await vscode.window.showQuickPick(list.map(t => ({ label: t.label, description: t.describe, picked: t.id !== 'claude-user', target: t })),
+      { canPickMany: true, placeHolder: 'PcbAi MCP kaydı hangi ajanlara yazılsın? (her dosyanın *.pcbai-bak yedeği alınır)' });
+    if (!picks || !picks.length) return;
+    const results = picks.map(p => setup.applyTarget(p.target));
+    for (const r of results) output.appendLine(`MCP ${r.label}: ${r.status}${r.message ? ' — ' + r.message : ''}${r.backup ? ' (yedek ' + r.backup + ')' : ''}`);
+    const text = setup.summary(results) + '. Ajanı yeniden başlatın.';
+    if (results.some(r => r.status !== 'written')) vscode.window.showWarningMessage('PcbAi MCP: ' + text);
+    else vscode.window.showInformationMessage('PcbAi MCP: ' + text);
+    return results;
+  },
 };
+
+// MCP registration context for mcp_setup.js: real paths here, temporary ones in tests.
+let nativeMcp = false;
+function mcpContext() {
+  const storage = extensionContext && extensionContext.globalStorageUri && extensionContext.globalStorageUri.fsPath;
+  const userDir = storage ? path.dirname(path.dirname(storage)) : path.join(process.env.APPDATA || os.homedir(), 'Code', 'User');
+  const folder = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0];
+  return { userDir, home: os.homedir(), workspace: folder ? folder.uri.fsPath : null, nativeVsCode: nativeMcp };
+}
+
+// User-only marker edits go through the view channel; agents never see these tools.
+async function viewCall(name, args) {
+  const live = await health();
+  if (!live) throw new Error('PcbAi servisi çalışmıyor');
+  return request(live.info, 'POST', '/view/call', { name, arguments: args });
+}
 
 // Session for the side bar without prompts: the running service's session of the remembered/KiCad/workspace project.
 async function sessionFor(interactive, change = false) {
@@ -469,6 +520,7 @@ async function assistSessionFor(_interactive, document) {
   } catch (_) {return null;}
 }
 
+let sidebar = null;
 function activate(context) {
   extensionContext = context;
   output = vscode.window.createOutputChannel('PcbAi');
@@ -478,9 +530,23 @@ function activate(context) {
   if (vscode.languages?.registerCompletionItemProvider && vscode.languages?.registerHoverProvider) {
     require('./part_assist').register(context, {call, sessionFor: assistSessionFor});
   }
+  try {
+    nativeMcp = require('./mcp_setup').registerNative(vscode, context, () => {
+      try { const { root, python } = settings(); return require('./mcp_setup').serverEntry({ python, root }); } catch (_) { return null; }
+    });
+  } catch (e) { output.appendLine('PcbAi: yerel MCP kaydı yapılamadı: ' + e.message); }
   if (vscode.window.registerWebviewViewProvider) {
-    require('./sidebar_view').registerSidebar(context, { call, sessionFor });
+    sidebar = require('./sidebar_view').registerSidebar(context, { call, viewCall, sessionFor, mcpContext, agentPrompt, events });
   }
+  if (vscode.window.registerUriHandler) require('./handoff').register(context, {
+    samePath,
+    onPrompt: prompt => sidebar && sidebar.setRequest(prompt),
+    serviceCall: async (urlPath, payload) => {
+      const live = await health();
+      if (!live) throw new Error('PcbAi servisi çalışmıyor');
+      return request(live.info, 'POST', urlPath, payload, 15000);
+    },
+  });
   for (const [name, fn] of Object.entries(commands)) {
     context.subscriptions.push(vscode.commands.registerCommand(name, async () => {
       try {

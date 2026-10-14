@@ -7,6 +7,13 @@ import time
 from pathlib import Path
 from urllib.request import ProxyHandler, Request, build_opener
 
+NO_PROJECT = ("PcbAi servisi çalışmıyor ve bu MCP kaydında proje yok. KiCad'de PcbAi'ye kaydet'e basın ya da "
+              "VS Code'da projeyi seçin, sonra yeniden deneyin.")
+
+
+class ServiceUnavailable(RuntimeError):
+    """User-level registrations carry no PCBAI_PROJECTS: without a running service there is nothing to open."""
+
 
 class Client:
     def __init__(self):
@@ -14,6 +21,8 @@ class Client:
         self.state = Path(base) if base else Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share")) / "PcbAi"
         self.projects = [str(Path(p).expanduser().resolve()) for p in json.loads(os.environ.get("PCBAI_PROJECTS", "[]"))]
         self.info = None
+        # Reported identity for the activity log only (vscode, kicad, mcp:<clientInfo.name>); grants nothing.
+        self.client_name = ""
         self.opener = build_opener(ProxyHandler({}))
 
     def _request(self, method, path, payload=None, timeout=150):
@@ -26,7 +35,8 @@ class Client:
             raise ValueError("Invalid service token")
         data = None if payload is None else json.dumps(payload, ensure_ascii=False).encode("utf-8")
         request = Request(f"http://127.0.0.1:{port}{path}", data=data, method=method,
-                          headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"})
+                          headers={"Authorization": "Bearer " + token, "Content-Type": "application/json",
+                                   **({"X-PcbAi-Client": self.client_name} if self.client_name else {})})
         with self.opener.open(request, timeout=timeout) as response:
             return json.load(response)
 
@@ -43,6 +53,8 @@ class Client:
             raise
         except (OSError, ValueError, KeyError):
             self.info = None
+        if not self.projects:
+            raise ServiceUnavailable(NO_PROJECT)
         root = Path(__file__).resolve().parents[1]
         bundled = root / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
         python = os.environ.get("PCBAI_SERVICE_PYTHON") or (str(bundled) if bundled.is_file() else sys.executable)

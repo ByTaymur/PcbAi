@@ -37,7 +37,7 @@ def export_spice(copy, document):
     return output.read_text(encoding="utf-8", errors="replace")
 
 
-def sanitize(text, allowed_roots):
+def sanitize(text, allowed_roots, *, require_analysis=True):
     """Inline checked model data, so ngspice cannot reopen unchecked includes or execute control scripts."""
     warnings, analyses = [], []
     roots = [Path(r).resolve() for r in allowed_roots]
@@ -119,9 +119,9 @@ def sanitize(text, allowed_roots):
         return output
 
     lines = expand(text)
-    if not analyses:
+    if not analyses and require_analysis:
         raise PcbAiError("no_analysis", "The schematic has no simulation command (.tran, .ac, .dc, .op …)")
-    if len(analyses) > 1:
+    if len(analyses) > 1 and require_analysis:
         raise PcbAiError("ambiguous_analysis", "Exactly one simulation command is supported per run")
     return lines, warnings, analyses
 

@@ -285,7 +285,7 @@ Kullanıcı: "R5'i 4,7k yap"   →   ajan: set_value(ref="R5", value="4k7")
 
 ```text
 PcbAi/
-├─ PLAN.md · AGENTS.md · CLAUDE.md (→ AGENTS.md) · README.md · LICENSE · SECURITY.md · pyproject.toml
+├─ PLAN.md · AGENTS.md · README.md · LICENSE · SECURITY.md · pyproject.toml
 ├─ pcbai/
 │  ├─ service/        HTTP servis (127.0.0.1 + belirteç), oturumlar, uzun işler, sürüm sayaçları
 │  ├─ core/           contract.py, registry.py, args.py, small.py (CadAI'dan uyarlanır)
@@ -665,6 +665,7 @@ kullanıcının mesajındaki sözcüklerle eklenir (CadAI `small.py`).
 > Ayrıntılı ve öne alınmış plan (11 Ekim 2026): [docs/plan-gorunum.md](docs/plan-gorunum.md) — kart/şematik/3B görünümü,
 > işaretler (G0–G6, ~5 hafta) ve KiCad eklentisinin PCM paketi olarak kurulması.
 > Eksiklerin tamamı ve tamamlama sırası: [docs/plan-eksikler.md](docs/plan-eksikler.md).
+> Ajan seçimi (Claude Code, Codex, Cline, Kilo, Copilot…) ve KiCad içi asistan penceresi: [docs/plan-ajan-arayuz.md](docs/plan-ajan-arayuz.md).
 
 CadAI eklentisinin iskeleti (extension.js, bridge.js, mcp_setup.js, agents.js, three.js görüntüleyici, build_vsix.py) uyarlanır.
 
@@ -730,7 +731,7 @@ projede anlamlı biçimde kalmalıdır. Böylece denetimin kendisi de test edilm
 
 1. Şablon projeyi geçici klasöre kopyalar (dosya modu; tekrarlanabilir).
 2. Ajanı çalıştırır: Claude Code başsız (`claude -p`, `--mcp-config benchmark/mcp.json`, `--allowedTools "mcp__pcbai"`;
-   başsızda onay verilemediği için CLAUDE.md'deki komut kuralları geçerli) ya da yerel model (CadAI'ın ajan döngüsü +
+   başsızda onay verilemediği için izin kuralları önceden tanımlanır) ya da yerel model (CadAI'ın ajan döngüsü +
    Ollama `/api/chat`).
 3. `checks.py` dosyalardan denetler; sonuç `benchmark/results/<tarih>-<model>.json`: ölçüt başına geçti/kaldı, süre,
    araç çağrısı, belirteç, maliyet.
@@ -760,7 +761,7 @@ projede anlamlı biçimde kalmalıdır. Böylece denetimin kendisi de test edilm
 - **İş paketi (İP) bitti tanımı:** testler yeşil · ruff temiz · ilgili belge (`docs/ir.md`, `docs/tools.md`…) güncel
   · PLAN.md'de sürüm notu · dokunulan yol kıyas setini etkiliyorsa kıyas yeniden koşulmuş ve ölçüt düşmemiş.
 - **Karar kayıtları:** her açık karar kapanınca `docs/decisions/NNNN-<konu>.md` (bağlam, seçenekler, karar, neden).
-- **Çapraz kontrol:** hatası pahalı işlerde (s-expr yazıcı, IR şeması, dosya yazan yollar, güvenlik) `ikiz`
+- **Çapraz kontrol:** hatası pahalı işlerde (s-expr yazıcı, IR şeması, dosya yazan yollar, güvenlik) bağımsız ikinci ajanla
   protokolü: ikinci ajan aynı işi bağımsız planlar ve uygular, farklar deftere yazılır.
 - **Sürüm:** 0.x; her faz bir küçük sürüm. Sürüm `pyproject.toml`, MCP `SERVER_INFO`, `package.json` ve
   `plugin.json`'da birlikte artar.
@@ -776,7 +777,7 @@ Süreler tek geliştirici + ajanlar için. Her İP'nin sonunda bölüm 7'deki bi
 - **İP-0.1 Ortam.** KiCad 10.0.4 → 10.0.7; IPC API'yi aç (Tercihler → Eklentiler; `api.enable_server`); Freerouting
   2.5.0 Windows CLI'si (Java gerekmez); servis venv'i (KiCad'in Python 3.11'i + kicad-python 0.8.0); Node 22 (eklenti
   testleri); Ollama servisi + `qwen3:8b`. **Bitti:** `python -m pcbai.doctor` hepsini sürümüyle buluyor.
-- **İP-0.2 Depo iskeleti.** git, LICENSE (K1), README, AGENTS.md, CLAUDE.md, SECURITY.md, pyproject (ruff), CI
+- **İP-0.2 Depo iskeleti.** git, LICENSE (K1), README, AGENTS.md, SECURITY.md, pyproject (ruff), CI
   (lint + birim). **Bitti:** CI yeşil.
 - **İP-0.3 Kıyas seti.** P1–P6: `problem.md`, `requirements.json`, `checks.py`, şablon proje; P2'nin referans çözümü
   KiCad'de elle çizilir. **Bitti:** P2 denetimleri referansta geçiyor, boş projede kalıyor.
@@ -821,7 +822,7 @@ Süreler tek geliştirici + ajanlar için. Her İP'nin sonunda bölüm 7'deki bi
 
 ### Faz 2 — Yazıcı, kontrol noktası, parça, şematik düzenleme (3 hafta) → v0.2
 
-- **İP-2.1 S-expr yazıcı.** Somut sözdizimi ağacı, düzenleme API'si, KiCad biçiminde yeni düğüm; `ikiz` ile çapraz
+- **İP-2.1 S-expr yazıcı.** Somut sözdizimi ağacı, düzenleme API'si, KiCad biçiminde yeni düğüm; bağımsız ikinci ajanla ile çapraz
   kontrol. **Bitti:** demolarda %100 gidiş-dönüş; rastgele düzenleme testinde kicad-cli dosyaları hatasız açıyor.
 - **İP-2.2 Şematik modeli.** Sembol (`lib_symbols` kopyası), tel, bağlantı noktası, etiketler, güç sembolleri,
   `PWR_FLAG`, alt sayfa ve örnekleri, numaralama, döndürmede pin konumu. **Bitti:** 5.2'deki her tuzak için test var.
@@ -1103,7 +1104,6 @@ Taslağa göre değişenler:
 - Güvenlik: kullanıcıya özel state ve alt nesne ACL'leri, proje sınırı/junction kontrolü, OS yazma kilidi,
   KiCad proje yöneticisi dahil açık süreç engeli, atomik replace sırasında owner/izin koruması.
 - Yerel testler ve gerçek KiCad entegrasyonu çalıştırıldı; nihai sayılar [durum kaydında](docs/status.md).
-- Bağımsız plan ve salt okunur kod denetimi [İkiz defterinde](IKIZ-DEFTERI.md). Tam iki uygulamalı ikiz koşusu yapılmadı.
 - Faz 0/1'in tüm kabulü verilmedi: canlı IPC, kıyas, VS Code ve ileriki fazlar açık.
   S2 ölçümü: 162 dosyanın 161'i strict okunuyor, bir tolerans farkı fail closed; [deney kaydı](docs/spikes/S2.md).
 
@@ -1115,7 +1115,7 @@ Taslağa göre değişenler:
 - Geçmiş kararı gölge git yerine içerik adresli blob + manifest olarak eşitlendi; çok belgeli atomik geri dönüş açık iştir.
 - Kart 2 siparişi Faz 7'nin başında doğrulanmış v0.6 tasarımından verilecek; teslim/ölçüm tamponu ayrıldı.
 - Çekirdek ilk commit'le kayda alındı. Lisans K1 ve uzak CI açık. Yerel test ve gerçek hiyerarşik netlist
-  sonuçları [durum kaydında](docs/status.md); bağımsız denetim kapsamı [defterde](IKIZ-DEFTERI.md).
+  sonuçları [durum kaydında](docs/status.md); bağımsız denetim kapsamı da orada.
 
 ### Faz 1 ilerlemesi 0.1.2 — 11 Ekim 2026
 

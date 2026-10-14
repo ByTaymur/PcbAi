@@ -25,7 +25,7 @@ def main():
     (work / "result.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     lines = [
         "# S11 — kicad-happy salt okunur ölçümü", "",
-        "13 Ekim 2026 · RD-B1 · uygulayan ölçümü; bağımsız Claude denetimi bekleniyor.", "",
+        "13 Ekim 2026 · RD-B1 · uygulayan ölçümü; bağımsız denetim bekleniyor.", "",
         f"Upstream: `aklofas/kicad-happy`, commit `{result['commit']}` (detached HEAD); MIT.",
         f"Lisans SHA-256: `{result['license_sha256']}`.",
         f"KiCad CLI **{result['cli_version']}**, KiCad Python **{result['python_version']}**.", "",

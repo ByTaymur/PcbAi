@@ -1,0 +1,20 @@
+{
+  "$schema": "https://go.kicad.org/api/schemas/v1",
+  "identifier": "org.pcbai.ajs1",
+  "name": "PcbAi AJ-S1 deneme",
+  "license": "LGPL-2.1-or-later",
+  "description": "Geçici ölçüm düğmesi (AJ-S1). Ürün değildir; deneme sonrası kaldırılır.",
+  "runtime": {"type": "python", "min_version": "3.9"},
+  "actions": [
+    {
+      "identifier": "pcbai.ajs1.window",
+      "name": "AJ-S1 pencere denemesi",
+      "description": "wx deneme penceresini ayrı süreçte açar (tek örnek, üst PID izleme, 500 ms seçim yoklaması).",
+      "show-button": true,
+      "scopes": ["pcb"],
+      "entrypoint": "ajs1_action.py",
+      "icons-light": ["icons/ajs1-24.png", "icons/ajs1-48.png"],
+      "icons-dark": ["icons/ajs1-24.png", "icons/ajs1-48.png"]
+    }
+  ]
+}
